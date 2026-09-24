@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#FFFFFF" />
+<title>OVY Wallet</title>
+<style>
+/* ==========================================================================
+   OVY WALLET — DESIGN TOKENS
+   ========================================================================== */
+:root{
+  --ovy-orange:#FF7A00; --ovy-orange-d:#E86A00; --ovy-orange-l:#FF9A3D;
+  --bg:#FFFFFF; --surface:#F6F6F7; --surface2:#EDEDF0;
+  --text:#0B0B0C; --text-2:#5F6068; --text-3:#9A9BA3;
+  --border:#E7E7EA; --divider:#EFEFF2;
+  --success:#0F9D58; --warn:#F4B400; --error:#DB4437; --info:#3B82F6;
+  --shadow-1:0 1px 2px rgba(0,0,0,.04),0 2px 6px rgba(0,0,0,.04);
+  --shadow-2:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
+  --shadow-3:0 8px 24px rgba(0,0,0,.10),0 16px 40px rgba(0,0,0,.08);
+  --r-s:8px; --r-m:12px; --r-l:16px; --r-xl:20px; --r-full:999px;
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px; --s-10:40px; --s-12:48px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+  --nav-h:64px;
+  --f-display:700 32px/1.15 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  --f-h1:700 24px/1.2 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  --f-h2:600 20px/1.25 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  --f-h3:600 17px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  --f-body:400 15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  --f-small:400 13px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  --f-cap:500 11px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  --f-btn:600 15px/1.2 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+  --f-amt-xl:700 40px/1.05 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  --f-amt-l:700 30px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;
+  --f-amt-m:600 18px/1.2 ui-monospace,"SF Mono","Menlo",monospace;
+  --f-amt-s:500 14px/1.2 ui-monospace,"SF Mono","Menlo",monospace;
+  --t-fast:120ms; --t-base:200ms; --t-slow:320ms;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+html[data-theme="dark"]{
+  --bg:#060606; --surface:#131313; --surface2:#1D1D1D;
+  --text:#F5F5F5; --text-2:#A3A3A8; --text-3:#6D6D73;
+  --border:#252525; --divider:#1A1A1A;
+  --shadow-1:0 1px 2px rgba(0,0,0,.5);
+  --shadow-2:0 4px 12px rgba(0,0,0,.6);
+  --shadow-3:0 8px 32px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:var(--f-body);min-height:100%;overflow-x:hidden;overscroll-behavior-y:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none;text-align:inherit}
+a{color:var(--ovy-orange);text-decoration:none}
+::-webkit-scrollbar{width:0;height:0}
+[hidden]{display:none !important}
+.ico-flip{display:block}
+html[dir="rtl"] .ico-flip{transform:scaleX(-1)}
+.ovy-num{direction:ltr;unicode-bidi:isolate}
+:focus-visible{outline:2px solid var(--ovy-orange);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+/* ==========================================================================
+   APP SHELL
+   ========================================================================== */
+#ovy-app{min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+.ovy-screen{flex:1;display:flex;flex-direction:column;padding-bottom:calc(var(--nav-h) + var(--safe-b) + 8px);padding-left:var(--safe-l);padding-right:var(--safe-r)}
+.ovy-screen--nonav{padding-bottom:calc(var(--safe-b) + 16px)}
+.ovy-screen--login{padding-bottom:var(--safe-b)}
+.ovy-header{
+  position:sticky;top:0;z-index:40;background:var(--bg);
+  display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:var(--s-2);
+  padding:calc(var(--s-2) + var(--safe-t)) var(--s-3) var(--s-2) var(--s-3);
+  min-height:calc(56px + var(--safe-t));
+}
+.ovy-header__title{font:var(--f-h3);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovy-header__icon{
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;position:relative;
+  border-radius:var(--r-full);transition:background var(--t-fast) var(--ease);
+}
+.ovy-header__icon:active{background:var(--surface2)}
+.ovy-header__icon svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ovy-content{flex:1;padding:var(--s-2) var(--s-4) var(--s-4);display:flex;flex-direction:column;gap:var(--s-4)}
+.ovy-content--top{padding-top:calc(var(--s-4) + var(--safe-t))}
+.ovy-content--flush{padding:0;gap:0}
+
+/* bottom nav */
+.ovy-bottomnav{
+  position:fixed;left:0;right:0;bottom:0;z-index:45;
+  background:color-mix(in srgb,var(--bg) 94%,transparent);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-top:1px solid var(--divider);
+  display:flex;justify-content:space-around;align-items:stretch;
+  padding:0 var(--s-2) var(--safe-b) var(--s-2);
+}
+.ovy-nav-item{
+  position:relative;flex:1;height:var(--nav-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:var(--text-3);font:var(--f-cap);transition:color var(--t-fast) var(--ease)
+}
+.ovy-nav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ovy-nav-item[aria-current="page"]{color:var(--ovy-orange)}
+.ovy-nav-item[aria-current="page"]::before{content:"";position:absolute;top:0;left:28%;right:28%;height:2px;border-radius:2px;background:var(--ovy-orange)}
+.ovy-nav-item:active{transform:scale(.96)}
+
+/* ==========================================================================
+   PRIMITIVES
+   ========================================================================== */
+.ovy-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 18px;border-radius:14px;font:var(--f-btn);
+  transition:transform var(--t-fast) var(--ease),opacity var(--t-fast) var(--ease),background var(--t-fast);
+  min-height:50px;width:auto;user-select:none;text-align:center
+}
+.ovy-btn--primary{background:var(--ovy-orange);color:#fff;box-shadow:0 6px 18px rgba(255,122,0,.28)}
+.ovy-btn--primary:active{background:var(--ovy-orange-d)}
+.ovy-btn--secondary{background:var(--surface2);color:var(--text)}
+.ovy-btn--outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.ovy-btn--ghost{background:transparent;color:var(--ovy-orange)}
+.ovy-btn--danger{background:var(--error);color:#fff}
+.ovy-btn--block{width:100%}
+.ovy-btn--sm{min-height:36px;padding:8px 14px;border-radius:10px;font:600 13px/1.2 -apple-system,sans-serif}
+.ovy-btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.ovy-btn:active:not([disabled]){transform:scale(.98)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.ovy-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l);padding:var(--s-4)}
+.ovy-card--accent{position:relative;overflow:hidden;background:linear-gradient(135deg,#FF8A1F 0%,#FF7A00 45%,#E25E00 100%);color:#fff;border:none;box-shadow:0 10px 28px rgba(255,122,0,.25)}
+.ovy-card--accent .ovy-card__sub{color:rgba(255,255,255,.85)}
+
+.ovy-hero{position:relative;overflow:hidden;border-radius:22px;padding:18px 18px 20px;color:#fff;background:linear-gradient(135deg,#FF8A1F 0%,#FF7A00 45%,#E25E00 100%);box-shadow:0 12px 30px rgba(255,122,0,.28)}
+.ovy-hero::after,.ovy-card--accent::after{content:"";position:absolute;inset:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 140' preserveAspectRatio='none'%3E%3Cpath d='M0 105C60 62 112 132 172 90S262 36 300 58V140H0Z' fill='%23ffffff' fill-opacity='.10'/%3E%3Cpath d='M0 124C70 92 122 142 192 108S270 70 300 86V140H0Z' fill='%23ffffff' fill-opacity='.12'/%3E%3C/svg%3E") no-repeat right bottom/cover}
+.ovy-hero>*,.ovy-card--accent>*{position:relative;z-index:1}
+.ovy-hero__top{display:flex;align-items:center;justify-content:space-between;font:var(--f-small);opacity:.92}
+.ovy-hero__amt{font:var(--f-amt-xl);margin-top:10px;letter-spacing:-.01em}
+.ovy-hero__sub{font:var(--f-small);opacity:.88;margin-top:6px}
+.ovy-hero__eye{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);color:#fff}
+.ovy-hero__eye svg{width:18px;height:18px}
+
+.ovy-list{display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l);overflow:hidden}
+.ovy-list__row{display:flex;align-items:center;gap:var(--s-3);padding:14px var(--s-4);border-bottom:1px solid var(--divider);transition:background var(--t-fast) var(--ease);cursor:pointer;text-align:start;width:100%;color:inherit}
+.ovy-list__row:last-child{border-bottom:none}
+.ovy-list__row:active{background:var(--surface2)}
+.ovy-list__row--disabled{opacity:.5;cursor:default}
+.ovy-list__icon{width:40px;height:40px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ovy-list__icon svg{width:20px;height:20px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ovy-list__body{flex:1;min-width:0}
+.ovy-list__title{font:var(--f-btn);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovy-list__sub{font:var(--f-small);color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.ovy-list__right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;color:var(--text-3)}
+.ovy-list__right svg{width:18px;height:18px}
+.ovy-list__amount{font:var(--f-amt-s);color:var(--text)}
+
+.ovy-tile{width:42px;height:42px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--tint,var(--ovy-orange)) 15%,transparent);color:var(--tint,var(--ovy-orange));font:800 11px/1 -apple-system,sans-serif;letter-spacing:.02em}
+.ovy-tile svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ovy-tile--solid{background:var(--ovy-orange);color:#fff}
+
+.ovy-input{display:flex;flex-direction:column;gap:6px}
+.ovy-input__label{font:var(--f-small);color:var(--text-2);font-weight:500}
+.ovy-input__wrap{position:relative;display:flex;align-items:center}
+.ovy-input__wrap>svg{position:absolute;inset-inline-start:14px;width:20px;height:20px;stroke:var(--text-3);pointer-events:none}
+.ovy-input__wrap .ovy-input__field{padding-inline-start:44px}
+.ovy-input__eye{position:absolute;inset-inline-end:6px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--text-3)}
+.ovy-input__eye svg{width:20px;height:20px}
+.ovy-input__field{
+  width:100%;padding:14px 16px;background:var(--surface);
+  border:1px solid var(--border);border-radius:14px;
+  font-size:16px;line-height:1.3;transition:border-color var(--t-fast) var(--ease),background var(--t-fast);
+}
+.ovy-input__field:focus{outline:none;border-color:var(--ovy-orange);background:var(--bg)}
+.ovy-input__field[aria-invalid="true"]{border-color:var(--error)}
+.ovy-input__error{font:var(--f-small);color:var(--error)}
+.ovy-input__hint{font:var(--f-small);color:var(--text-3)}
+
+.ovy-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--r-full);font:var(--f-cap);background:var(--surface2);color:var(--text-2)}
+.ovy-badge--success{background:color-mix(in srgb,var(--success) 15%,transparent);color:var(--success)}
+.ovy-badge--warn{background:color-mix(in srgb,var(--warn) 20%,transparent);color:#8A6A00}
+html[data-theme="dark"] .ovy-badge--warn{color:#F4C542}
+.ovy-badge--error{background:color-mix(in srgb,var(--error) 15%,transparent);color:var(--error)}
+.ovy-badge--accent{background:color-mix(in srgb,var(--ovy-orange) 15%,transparent);color:var(--ovy-orange-d)}
+html[data-theme="dark"] .ovy-badge--accent{color:var(--ovy-orange-l)}
+
+.ovy-chip{padding:9px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-full);font:600 13px/1 -apple-system,sans-serif;white-space:nowrap;transition:all var(--t-fast) var(--ease);color:var(--text-2)}
+.ovy-chip[aria-pressed="true"]{background:var(--ovy-orange);color:#fff;border-color:var(--ovy-orange)}
+.ovy-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+
+.ovy-empty{padding:var(--s-8) var(--s-4);text-align:center;color:var(--text-2);display:flex;flex-direction:column;align-items:center;gap:var(--s-3)}
+.ovy-empty>svg{width:56px;height:56px;stroke:var(--text-3);fill:none;stroke-width:1.5}
+.ovy-empty__title{font:var(--f-h3);color:var(--text)}
+.ovy-empty__sub{font:var(--f-small);max-width:280px}
+
+.ovy-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:110;display:flex;align-items:center;justify-content:center;padding:var(--s-4);animation:fadeIn var(--t-fast) var(--ease)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.ovy-dialog{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-xl);padding:var(--s-5);max-width:380px;width:100%;box-shadow:var(--shadow-3);display:flex;flex-direction:column;gap:var(--s-3)}
+.ovy-dialog__title{font:var(--f-h3)}
+.ovy-dialog__actions{display:flex;gap:var(--s-2);justify-content:flex-end}
+
+/* ==========================================================================
+   BOOT LOADER (always dark, like the launch screen)
+   ========================================================================== */
+#ovy-boot{position:fixed;inset:0;z-index:100;background:radial-gradient(120% 80% at 50% 0%,#1a0f05 0%,#060606 60%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-2);transition:opacity var(--t-slow) var(--ease);overflow:hidden}
+#ovy-boot.is-hidden{opacity:0;pointer-events:none}
+.ovy-lockup{display:flex;align-items:center;gap:12px}
+.ovy-lockup__word{display:flex;flex-direction:column;line-height:1}
+.ovy-lockup__name{font:900 40px/1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.02em}
+.ovy-lockup__sub{font:600 18px/1.1 -apple-system,sans-serif;color:var(--ovy-orange);margin-top:4px}
+.ovy-boot__tag{font:var(--f-body);color:rgba(255,255,255,.82);text-align:center;margin-top:var(--s-6);max-width:240px}
+.ovy-boot__bar{width:110px;height:3px;background:rgba(255,255,255,.14);border-radius:2px;overflow:hidden;margin-top:var(--s-8)}
+.ovy-boot__fill{height:100%;background:var(--ovy-orange);width:0%;transition:width var(--t-base) var(--ease)}
+.ovy-boot__label{font:var(--f-cap);color:rgba(255,255,255,.5);margin-top:var(--s-2)}
+.ovy-wave{position:absolute;left:0;right:0;bottom:0;width:100%;height:150px;pointer-events:none}
+
+.ovy-inline-loading{display:flex;align-items:center;justify-content:center;padding:var(--s-6);color:var(--text-3);gap:var(--s-2);font:var(--f-small)}
+.ovy-dot{width:6px;height:6px;border-radius:50%;background:var(--ovy-orange);animation:pulse 1.2s infinite}
+.ovy-dot:nth-child(2){animation-delay:.15s}
+.ovy-dot:nth-child(3){animation-delay:.3s}
+@keyframes pulse{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+/* ==========================================================================
+   IN-APP NOTIFICATION BANNER
+   ========================================================================== */
+#ovy-banner-layer{position:fixed;top:calc(var(--safe-t) + 8px);left:8px;right:8px;z-index:90;pointer-events:none;display:flex;flex-direction:column;gap:8px;align-items:center}
+.ovy-banner{
+  pointer-events:auto;max-width:520px;width:100%;
+  background:color-mix(in srgb,var(--surface) 90%,transparent);
+  backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);
+  border:1px solid var(--border);border-radius:18px;padding:12px 14px;
+  box-shadow:var(--shadow-3);display:flex;gap:12px;align-items:flex-start;
+  animation:bannerIn var(--t-slow) var(--ease) both;
+}
+@keyframes bannerIn{from{opacity:0;transform:translateY(-16px) scale(.96)}to{opacity:1;transform:none}}
+.ovy-banner__icon{width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--success) 18%,transparent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ovy-banner__icon svg{width:20px;height:20px;stroke:var(--success);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.ovy-banner__body{flex:1;min-width:0;cursor:pointer}
+.ovy-banner__title{font:var(--f-btn);margin-bottom:2px}
+.ovy-banner__line{font:var(--f-small);color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovy-banner__amount{font:var(--f-amt-s);margin-top:4px;color:var(--text)}
+.ovy-banner__close{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--surface2);color:var(--text-2)}
+.ovy-banner__close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+
+/* ==========================================================================
+   MISC
+   ========================================================================== */
+.ovy-row{display:flex;align-items:center;gap:var(--s-3)}
+.ovy-row--between{justify-content:space-between}
+.ovy-col{display:flex;flex-direction:column;gap:var(--s-2)}
+.ovy-grow{flex:1;min-width:0}
+.ovy-label{font:var(--f-cap);color:var(--text-2);letter-spacing:.02em}
+.ovy-section{display:flex;justify-content:space-between;align-items:center;margin-top:var(--s-2)}
+.ovy-section__title{font:var(--f-h3)}
+.ovy-tx-row{display:flex;align-items:center;gap:var(--s-3);padding:12px var(--s-4);border-bottom:1px solid var(--divider);cursor:pointer;transition:background var(--t-fast);text-decoration:none;color:inherit}
+.ovy-tx-row:last-child{border-bottom:none}
+.ovy-tx-row:active{background:var(--surface2)}
+.ovy-tx-row__body{flex:1;min-width:0}
+.ovy-tx-row__name{font:var(--f-btn);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovy-tx-row__phone{font:var(--f-small);color:var(--text-2);margin-top:2px;font-variant-numeric:tabular-nums}
+.ovy-tx-row__right{text-align:end;flex-shrink:0}
+.ovy-tx-row__amt{font:var(--f-amt-s);direction:ltr;unicode-bidi:isolate}
+.ovy-tx-row__amt--c{color:var(--success)}
+.ovy-tx-row__status{font:var(--f-cap);color:var(--text-3);margin-top:2px}
+
+.ovy-topbar{display:flex;align-items:center;gap:12px}
+.ovy-topbar__hello{font:var(--f-small);color:var(--text-2)}
+.ovy-topbar__name{font:var(--f-h3)}
+.ovy-bell{position:relative;width:42px;height:42px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text)}
+.ovy-bell svg{width:20px;height:20px}
+.ovy-bell__n{position:absolute;top:-3px;inset-inline-end:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--ovy-orange);color:#fff;font:700 10px/18px sans-serif;text-align:center}
+
+.ovy-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ovy-quick__item{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--text);font:var(--f-small);text-align:center}
+.ovy-quick__item .ovy-tile{width:56px;height:56px;border-radius:18px}
+.ovy-quick__item .ovy-tile svg{width:24px;height:24px}
+.ovy-quick__item:active .ovy-tile{transform:scale(.94)}
+
+.ovy-more{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.ovy-more__item{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l);color:var(--text);font:var(--f-btn)}
+.ovy-more__item:active{background:var(--surface2)}
+.ovy-more__n{position:absolute;top:12px;inset-inline-end:12px}
+.ovy-banner-card{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r-l);color:#fff;background:linear-gradient(135deg,#1a1a1a 0%,#0a0a0a 100%);border:1px solid #2a2a2a;overflow:hidden;position:relative}
+.ovy-banner-card::after{content:"";position:absolute;inset:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100' preserveAspectRatio='none'%3E%3Cpath d='M120 100C170 40 220 90 300 20V100Z' fill='%23FF7A00' fill-opacity='.85'/%3E%3C/svg%3E") no-repeat right bottom/60% 100%}
+.ovy-banner-card>*{position:relative;z-index:1}
+
+.ovy-card-visual{aspect-ratio:1.586;width:100%;max-width:360px;border-radius:20px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:linear-gradient(135deg,#0A0A0A 0%,#1E1E1E 60%,#0A0A0A 100%);position:relative;overflow:hidden;box-shadow:var(--shadow-2)}
+.ovy-card-visual--white{background:linear-gradient(135deg,#FFFFFF 0%,#F0F0F2 60%,#FFFFFF 100%);color:#0A0A0A;border:1px solid var(--border)}
+.ovy-card-visual--frozen{opacity:.55}
+.ovy-card-visual__top{display:flex;justify-content:space-between;align-items:center}
+.ovy-card-visual__brand{font:800 16px/1 -apple-system,sans-serif;letter-spacing:.15em;color:var(--ovy-orange)}
+.ovy-visa{font:italic 900 22px/1 -apple-system,sans-serif;letter-spacing:-.02em}
+.ovy-card-visual__num{font:600 19px/1 ui-monospace,"SF Mono",monospace;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.ovy-card-visual__row{display:flex;justify-content:space-between;font:var(--f-cap);letter-spacing:.08em;opacity:.9}
+.ovy-cardlink{display:flex;justify-content:center}
+
+.ovy-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:340px;margin:0 auto;width:100%}
+.ovy-keypad button{height:58px;background:var(--surface);border:1px solid var(--border);border-radius:16px;font:600 22px/1 -apple-system,sans-serif;transition:background var(--t-fast);display:flex;align-items:center;justify-content:center;text-align:center}
+.ovy-keypad button:active{background:var(--surface2);transform:scale(.97)}
+.ovy-keypad button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ovy-keypad__gap{visibility:hidden}
+.ovy-otp-dots{display:flex;gap:8px;justify-content:center;margin:var(--s-4) 0}
+.ovy-otp-dots i{width:44px;height:52px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:border-color var(--t-fast)}
+.ovy-otp-dots i.on{border-color:var(--ovy-orange)}
+.ovy-otp-dots i.on::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--ovy-orange)}
+.ovy-shake{animation:shake .32s var(--ease)}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+.ovy-divider{height:1px;background:var(--divider);margin:var(--s-2) 0}
+.ovy-toggle{position:relative;width:48px;height:28px;border-radius:999px;background:var(--surface2);transition:background var(--t-fast);flex-shrink:0}
+.ovy-toggle[aria-checked="true"]{background:var(--ovy-orange)}
+.ovy-toggle::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform var(--t-fast) var(--ease)}
+.ovy-toggle[aria-checked="true"]::after{transform:translateX(20px)}
+html[dir="rtl"] .ovy-toggle::after{left:auto;right:2px}
+html[dir="rtl"] .ovy-toggle[aria-checked="true"]::after{transform:translateX(-20px)}
+
+.ovy-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--ovy-orange) 0%,var(--ovy-orange-d) 100%);color:#fff;display:flex;align-items:center;justify-content:center;font:700 18px/1 -apple-system,sans-serif;flex-shrink:0}
+.ovy-avatar--lg{width:64px;height:64px;font-size:24px}
+.ovy-toast{position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 20px);left:16px;right:16px;max-width:420px;margin:0 auto;background:var(--text);color:var(--bg);padding:12px 16px;border-radius:var(--r-m);font:var(--f-small);text-align:center;z-index:120;animation:bannerIn var(--t-base) var(--ease) both}
+
+/* amount */
+.ovy-amount{display:flex;align-items:baseline;gap:10px;padding:18px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l)}
+.ovy-amount:focus-within{border-color:var(--ovy-orange)}
+.ovy-amount input{flex:1;min-width:0;background:none;border:none;outline:none;font:var(--f-amt-xl);color:var(--text);padding:0;direction:ltr;text-align:start}
+.ovy-amount__cur{font:var(--f-h3);color:var(--text-2)}
+
+/* recognition */
+.ovy-recog{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r-l);background:var(--surface);border:1px solid var(--border);min-height:76px;transition:border-color var(--t-base) var(--ease)}
+.ovy-recog.is-empty{display:none}
+.ovy-recog.is-found{border-color:var(--ovy-orange);background:color-mix(in srgb,var(--ovy-orange) 8%,var(--surface));animation:bannerIn var(--t-base) var(--ease) both}
+.ovy-recog.is-missing{border-color:var(--error);background:color-mix(in srgb,var(--error) 7%,var(--surface))}
+.ovy-recog__icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--ovy-orange);color:#fff}
+.ovy-recog__icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ovy-recog__icon--err{background:var(--error)}
+.ovy-recog__ring{width:42px;height:42px;border-radius:50%;border:3px solid color-mix(in srgb,var(--ovy-orange) 22%,transparent);border-top-color:var(--ovy-orange);animation:spin .8s linear infinite;flex-shrink:0}
+.ovy-recog__label{font:var(--f-small);color:var(--text-2)}
+.ovy-recog__name{font:var(--f-amt-m);word-break:break-all;margin-top:2px}
+.ovy-recog__phone{font:var(--f-small);color:var(--text-2);margin-top:2px;font-variant-numeric:tabular-nums}
+
+/* processing + success */
+.ovy-proc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;padding:40px 24px;min-height:70dvh}
+.ovy-proc__ring{position:relative;width:170px;height:170px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,color-mix(in srgb,var(--ovy-orange) 20%,transparent) 0%,transparent 70%)}
+.ovy-proc__ring::before{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid color-mix(in srgb,var(--ovy-orange) 22%,transparent)}
+.ovy-proc__arc{position:absolute;inset:0;border-radius:50%;border:3px solid transparent;border-top-color:var(--ovy-orange);animation:spin 1.1s linear infinite}
+.ovy-proc__icon{color:var(--ovy-orange);display:flex}
+.ovy-proc__title{font:var(--f-h2);max-width:280px}
+.ovy-proc__sub{font:var(--f-small);color:var(--text-2);max-width:260px}
+.ovy-success{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:20px 0 4px}
+.ovy-success__ring{width:96px;height:96px;border-radius:50%;border:4px solid var(--ovy-orange);display:flex;align-items:center;justify-content:center;color:var(--ovy-orange);box-shadow:0 0 0 10px color-mix(in srgb,var(--ovy-orange) 13%,transparent);margin-bottom:14px;animation:pop var(--t-slow) var(--ease) both}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:none;opacity:1}}
+.ovy-success__amt{font:var(--f-amt-l);margin-top:4px}
+.ovy-kv{display:flex;align-items:center;gap:12px;padding:12px 0}
+.ovy-kv+.ovy-kv{border-top:1px solid var(--divider)}
+.ovy-kv__k{font:var(--f-cap);color:var(--text-2)}
+.ovy-kv__v{font:var(--f-btn);overflow-wrap:anywhere}
+
+/* ==========================================================================
+   LOGIN SCREEN
+   ========================================================================== */
+.ovy-login{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;min-height:100dvh;padding:calc(var(--s-6) + var(--safe-t)) var(--s-5) calc(150px + var(--safe-b));max-width:440px;margin:0 auto;width:100%}
+.ovy-login__brand{display:flex;flex-direction:column;align-items:center;margin-bottom:var(--s-8)}
+.ovy-login__brand .ovy-lockup__name{font-size:34px}
+.ovy-login__brand .ovy-lockup__sub{font-size:16px}
+.ovy-login__title{font:var(--f-h1);margin-bottom:2px}
+.ovy-login__sub{font:var(--f-small);color:var(--text-2);margin-bottom:var(--s-4)}
+.ovy-login__form{display:flex;flex-direction:column;gap:var(--s-3)}
+.ovy-login__link{align-self:center;font:var(--f-small);color:var(--ovy-orange);padding:4px 8px}
+.ovy-login__or{display:flex;align-items:center;gap:12px;color:var(--text-3);font:var(--f-small);margin-top:var(--s-2)}
+.ovy-login__or::before,.ovy-login__or::after{content:"";flex:1;height:1px;background:var(--divider)}
+.ovy-login__social{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ovy-login__foot{text-align:center;font:var(--f-small);color:var(--text-2);margin-top:var(--s-2)}
+.ovy-login-wave{position:fixed;left:0;right:0;bottom:0;width:100%;height:150px;pointer-events:none;z-index:0}
+</style>
+</head>
+<body>
+
+<!-- BOOT LOADER -->
+<div id="ovy-boot" role="status" aria-live="polite">
+  <div id="ovy-boot-brand"></div>
+  <div class="ovy-boot__tag" id="ovy-boot-tag"></div>
+  <div class="ovy-boot__bar"><div class="ovy-boot__fill" id="ovy-boot-fill"></div></div>
+  <div class="ovy-boot__label" id="ovy-boot-label">Chargement…</div>
+  <svg class="ovy-wave" viewBox="0 0 400 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 110C80 60 150 140 230 96S350 40 400 70V150H0Z" fill="#FF7A00" fill-opacity=".16"/><path d="M0 128C90 96 160 150 250 118S360 92 400 104V150H0Z" fill="#FF7A00" fill-opacity=".30"/></svg>
+</div>
+
+<!-- BANNER LAYER -->
+<div id="ovy-banner-layer" aria-live="polite"></div>
+
+<!-- APP ROOT -->
+<div id="ovy-app"></div>
+
+<script>
+'use strict';
+(function(){
+
+/* ==========================================================================
+   ICONS
+   ========================================================================== */
+const ICONS = {
+  home:     '<path d="M3 11l9-8 9 8v10a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2V11z"/>',
+  accounts: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/>',
+  transfer: '<path d="M7 17l-4-4 4-4M17 7l4 4-4 4M3 13h18M21 11H3"/>',
+  cards:    '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h2"/>',
+  crypto:   '<circle cx="12" cy="12" r="9"/><path d="M9 9h4a2 2 0 0 1 0 4H9v2h4M11 7v2M11 15v2"/>',
+  services: '<rect x="3" y="4" width="8" height="8" rx="1.5"/><rect x="13" y="4" width="8" height="8" rx="1.5"/><rect x="3" y="14" width="8" height="6" rx="1.5"/><rect x="13" y="14" width="8" height="6" rx="1.5"/>',
+  history:  '<path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/><path d="M12 8v4l3 2"/>',
+  notif:    '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8z"/><path d="M10 21a2 2 0 0 0 4 0"/>',
+  profile:  '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 0 0-2-1.2L14.2 3h-4l-.4 2.6a7 7 0 0 0-2 1.2L5.5 6 3.5 9.3l2 1.5A7 7 0 0 0 5.4 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.3-.9a7 7 0 0 0 2 1.2L10.2 21h4l.4-2.6a7 7 0 0 0 2-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/>',
+  security: '<path d="M12 3l8 4v6c0 5-3.5 8-8 8s-8-3-8-8V7l8-4z"/><path d="M9 12l2 2 4-4"/>',
+  help:     '<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4M12 17h.01"/>',
+  back:     '<path d="M15 6l-6 6 6 6"/>',
+  close:    '<path d="M6 6l12 12M18 6l-12 12"/>',
+  check:    '<path d="M5 12l5 5L20 7"/>',
+  warn:     '<path d="M12 3l10 18H2L12 3zM12 10v5M12 18h.01"/>',
+  error:    '<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16h.01"/>',
+  lock:     '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  send:     '<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>',
+  receive:  '<path d="M22 12L11 1M22 12l-7 4-4-4-4-4"/>',
+  plus:     '<path d="M12 5v14M5 12h14"/>',
+  chev:     '<path d="M9 6l6 6-6 6"/>',
+  share:    '<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v14"/>',
+  doc:      '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/>',
+  globe:    '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>',
+  moon:     '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  sun:      '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  logout:   '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  user:     '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>',
+  users:    '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14c2.2.8 3.5 3 3.5 6"/>',
+  key:      '<circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 4l3 3M14 6l3 3"/>',
+  more:     '<path d="M4 7h16M4 12h16M4 17h10"/>',
+  eye:      '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:   '<path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.6 8.4 2 12 2 12s3.5 7 10 7c1.7 0 3.2-.4 4.5-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  backspace:'<path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="M14 9l4 6M18 9l-4 6"/>',
+  phone:    '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  bank:     '<path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>'
+};
+function svg(name, size, sw){
+  const s = size || 24;
+  const flip = (name === 'back' || name === 'chev') ? ' class="ico-flip"' : '';
+  return '<svg' + flip + ' viewBox="0 0 24 24" width="' + s + '" height="' + s + '" fill="none" stroke="currentColor" stroke-width="' + (sw || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
+}
+function logoMark(size){
+  return '<svg viewBox="0 0 48 48" width="' + size + '" height="' + size + '" fill="none" aria-hidden="true">' +
+    '<path d="M24 6a18 18 0 1 0 18 18" stroke="#FF7A00" stroke-width="7" stroke-linecap="round"/>' +
+    '<path d="M28 6h14v14" stroke="#FF7A00" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function lockup(size){
+  return '<div class="ovy-lockup">' + logoMark(size || 56) +
+    '<div class="ovy-lockup__word"><span class="ovy-lockup__name">OVY</span><span class="ovy-lockup__sub">Wallet</span></div></div>';
+}
+
+/* ==========================================================================
+   EVENT BUS
+   ========================================================================== */
+const EventBus = (() => {
+  const map = new Map();
+  return {
+    on(ev, fn){ if(!map.has(ev)) map.set(ev, new Set()); map.get(ev).add(fn); return () => map.get(ev).delete(fn); },
+    emit(ev, payload){ (map.get(ev)||[]).forEach(fn => { try{ fn(payload); }catch(e){ console.error('[EventBus]', ev, e); } }); }
+  };
+})();
+
+/* ==========================================================================
+   MONEY
+   ========================================================================== */
+const CURRENCY_DECIMALS = { OMR: 3, USD: 2, EUR: 2 };
+const CURRENCY_SCALE = { OMR: 1000, USD: 100, EUR: 100 };
+const CURRENCY_TINT = { OMR: '#FF7A00', USD: '#3B82F6', EUR: '#22A05B' };
+const Money = {
+  toMinor(v, c){ return Math.round((Number(v)||0) * CURRENCY_SCALE[c]); },
+  fromMinor(m, c){ return m / CURRENCY_SCALE[c]; },
+  add(a, b, c){ return Money.fromMinor(Money.toMinor(a,c) + Money.toMinor(b,c), c); },
+  sub(a, b, c){ return Money.fromMinor(Money.toMinor(a,c) - Money.toMinor(b,c), c); },
+  gte(a, b, c){ return Money.toMinor(a,c) >= Money.toMinor(b,c); },
+  eq(a, b, c){ return Money.toMinor(a,c) === Money.toMinor(b,c); },
+  hasValidPrecision(v, c){
+    const scale = CURRENCY_SCALE[c] || 100;
+    return Math.abs(v * scale - Math.round(v * scale)) < 1e-6;
+  },
+  format(v, c){
+    const d = CURRENCY_DECIMALS[c] || 2;
+    const n = Number(v) || 0;
+    return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }) + ' ' + c;
+  }
+};
+
+/* ==========================================================================
+   IDS
+   ========================================================================== */
+let _seqTx = 0, _seqTrf = 0;
+function pad6(n){ return String(n).padStart(6, '0'); }
+function today(){ const d = new Date(); return '' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0'); }
+const Ids = {
+  transfer(){ _seqTrf++; return 'TRF_' + today() + '_' + Date.now().toString(36).toUpperCase() + pad6(_seqTrf); },
+  transaction(){ _seqTx++; return 'TX_' + today() + '_' + Date.now().toString(36).toUpperCase() + pad6(_seqTx); },
+  reference(){ return 'OVY-TRF-' + Math.random().toString(36).slice(2,10).toUpperCase(); },
+  ben(){ return 'ben_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); },
+  card(){ return 'card_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); },
+  wallet(){ return 'cw_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); },
+  notif(){ return 'notif_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); },
+  evt(){ return 'evt_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); },
+  kyc(){ return 'kyc_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+};
+
+/* ==========================================================================
+   MASK / PHONE
+   ========================================================================== */
+function maskName(name){
+  if (!name) return '';
+  const parts = String(name).trim().split(/\s+/);
+  if (parts.length === 1){
+    const p = parts[0].toUpperCase();
+    return p.slice(0,4) + '#'.repeat(Math.max(8, 24 - Math.min(4,p.length)));
+  }
+  const first = parts[0].toUpperCase().slice(0,4);
+  const last = parts[parts.length-1].toUpperCase();
+  const middle = Math.max(8, 24 - first.length - last.length);
+  return first + '#'.repeat(middle) + last;
+}
+function normalizePhone(input){
+  if (!input) return '';
+  let p = String(input).trim().replace(/[\s\-().]/g, '');
+  if (p.startsWith('00')) p = '+' + p.slice(2);
+  return p;
+}
+function phonesMatch(a, b){
+  const na = normalizePhone(a).replace(/^\+/, '');
+  const nb = normalizePhone(b).replace(/^\+/, '');
+  return na === nb && na.length >= 6;
+}
+
+/* ==========================================================================
+   STORAGE
+   ========================================================================== */
+const StorageEngine = (() => {
+  const LS_PREFIX = 'ovy_ls_';
+  const SCHEMA_VERSION = 3;
+  let memory = {};
+
+  return {
+    async init(){
+      const keys = ['accounts','beneficiaries','transactions','notifications','cards','cryptoWallets','profile','settings','security','kyc','events','committedTransfers','session','ledger'];
+      for (const k of keys){
+        try {
+          const raw = localStorage.getItem(LS_PREFIX + k);
+          memory[k] = raw ? JSON.parse(raw) : undefined;
+        } catch { memory[k] = undefined; }
+      }
+    },
+    async get(key){
+      try {
+        const raw = localStorage.getItem(LS_PREFIX + key);
+        return raw ? JSON.parse(raw) : undefined;
+      } catch { return undefined; }
+    },
+    async set(key, value){
+      memory[key] = value;
+      try { localStorage.setItem(LS_PREFIX + key, JSON.stringify(value)); } catch {}
+      EventBus.emit('storageChanged', { key });
+    },
+    getSync(key){ return memory[key]; },
+    async update(key, patch){
+      const current = (await StorageEngine.get(key)) || {};
+      const next = { ...current, ...patch };
+      await StorageEngine.set(key, next);
+      return next;
+    },
+    async migrate(){
+      const v = (await StorageEngine.get('__schema')) || 0;
+      if (v >= SCHEMA_VERSION) return;
+      await StorageEngine.set('__schema', SCHEMA_VERSION);
+    }
+  };
+})();
+
+/* ==========================================================================
+   LOADING
+   ========================================================================== */
+const LoadingManager = (() => {
+  const stack = [];
+  return {
+    start(ctx, label){ stack.push({ ctx, label, at: Date.now() }); EventBus.emit('loadingChanged'); },
+    stop(ctx){ const i = stack.findIndex(s => s.ctx === ctx); if (i !== -1) stack.splice(i, 1); EventBus.emit('loadingChanged'); },
+    isLoading(ctx){ return ctx ? stack.some(s => s.ctx === ctx) : stack.length > 0; }
+  };
+})();
+
+/* ==========================================================================
+   TRANSLATIONS
+   ========================================================================== */
+const TRANSLATIONS = {
+  fr: {
+    'app.name': 'OVY Wallet',
+    'boot.tagline': 'Une liberté financière à portée de main','boot.loading': 'Chargement…',
+    'login.phone': 'Téléphone','login.password': 'Mot de passe','login.submit': 'Se connecter','login.error': 'Identifiants invalides','login.subtitle': 'Connectez-vous à votre compte',
+    'login.welcome': 'Bienvenue','login.forgot': 'Mot de passe oublié ?','login.orWith': 'Ou continuer avec','login.noAccount': "Vous n'avez pas de compte ?",'login.signup': 'Inscription','login.show': 'Afficher',
+    'nav.home': 'Accueil','nav.accounts': 'Comptes','nav.transfer': 'Transfert','nav.cards': 'Cartes','nav.profile': 'Profil','nav.crypto': 'Crypto','nav.more': 'Plus',
+    'action.continue': 'Continuer','action.cancel': 'Annuler','action.confirm': 'Confirmer','action.save': 'Enregistrer','action.done': 'Terminé','action.viewAll': 'Tout voir','action.back': 'Retour','action.backHome': "Retour à l'accueil",'action.copied': 'Copié',
+    'time.now': "À l'instant",
+    'status.completed': 'Terminé','status.failed': 'Échoué','status.pending': 'En attente','status.processing': 'En cours','status.cancelled': 'Annulé',
+    'account.OMR': 'Compte OMR','account.USD': 'Compte USD','account.EUR': 'Compte EUR',
+    'home.greeting': 'Bonjour','home.quickActions': 'Actions rapides','home.recent': 'Transactions récentes','home.noTx': 'Aucune transaction','home.mainAccount': 'Compte principal','home.myAccounts': 'Mes comptes','home.hideBalance': 'Masquer le solde',
+    'accounts.title': 'Comptes','accounts.detail': 'Détail du compte','accounts.available': 'Disponible',
+    'transfer.title': 'Transfert','transfer.type': 'Type','transfer.type.local': 'Local','transfer.type.international': 'International','transfer.method': 'Méthode','transfer.method.mobile': 'Mobile','transfer.method.account': 'Compte','transfer.method.bank': 'Banque','transfer.method.card': 'Carte','transfer.method.wallet': 'Portefeuille','transfer.beneficiary': 'Bénéficiaire','transfer.phone': 'Numéro de téléphone','transfer.recognize': 'Recherche…','transfer.searching': 'Recherche…','transfer.recognizing': 'Reconnaissance…','transfer.found': 'Bénéficiaire trouvé','transfer.notFound': 'Bénéficiaire introuvable','transfer.checkNumber': 'Vérifiez le numéro saisi','transfer.enterNumber': 'Saisissez un numéro pour rechercher le bénéficiaire','transfer.sourceAccount': 'Compte source','transfer.amount': 'Montant','transfer.fees': 'Frais','transfer.feeEstimate': 'Frais estimés','transfer.total': 'Total','transfer.review': 'Vérification','transfer.otp': 'Code de vérification','transfer.otpHint': 'Entrez le code à 6 chiffres','transfer.processing': 'Traitement en cours…','transfer.processingTitle': 'Votre transfert est en cours de traitement…','transfer.processingSub': 'Veuillez patienter, cela ne prendra que quelques instants.','transfer.success': 'Transfert réussi','transfer.sentOk': 'Envoyé avec succès','transfer.receipt': 'Voir le reçu','transfer.resume': 'Reprendre le transfert',
+    'beneficiaries.title': 'Bénéficiaires','beneficiaries.empty': 'Aucun bénéficiaire','beneficiaries.add': 'Ajouter un bénéficiaire','beneficiaries.name': 'Nom complet','beneficiaries.phone': 'Téléphone','beneficiaries.account': 'Numéro de compte','beneficiaries.iban': 'IBAN','beneficiaries.bank': 'Banque','beneficiaries.country': 'Pays','beneficiaries.currency': 'Devise',
+    'cards.title': 'Cartes','cards.detail': 'Détail de la carte','cards.empty': 'Aucune carte','cards.createVirtual': 'Créer une carte virtuelle','cards.holder': 'Titulaire','cards.activate': 'Activer','cards.freeze': 'Geler','cards.unfreeze': 'Dégeler','cards.close': 'Fermer','cards.physical': 'Physique','cards.virtual': 'Virtuelle','cards.status.active': 'Active','cards.status.frozen': 'Gelée','cards.status.inactive': 'Inactive','cards.status.closed': 'Fermée',
+    'crypto.title': 'Crypto','crypto.total': 'Valeur totale','crypto.createWallet': 'Créer un portefeuille','crypto.noWallet': 'Aucun portefeuille','crypto.walletCreated': 'Portefeuille créé','crypto.assets': 'Actifs',
+    'more.title': 'Plus','more.securityTitle': 'Votre sécurité','more.securitySub': 'Notre priorité',
+    'services.title': 'Services','services.bills': 'Factures','services.topup': 'Recharge mobile','services.internet': 'Internet','services.utilities': 'Utilitaires','services.subscriptions': 'Abonnements','services.government': 'Services gouvernementaux','services.other': 'Autres services','services.unavailable': 'Service indisponible',
+    'history.title': 'Historique','history.empty': 'Aucune transaction','history.today': "Aujourd'hui",'history.yesterday': 'Hier','history.all': 'Tout','history.transfers': 'Transferts',
+    'tx.detail': 'Détail de la transaction','tx.recipient': 'Destinataire','tx.from': 'Depuis','tx.amount': 'Montant','tx.fee': 'Frais','tx.total': 'Total','tx.reference': 'Référence','tx.date': 'Date','tx.status': 'Statut','tx.id': 'ID de transaction',
+    'receipt.title': 'Reçu','receipt.heading': 'REÇU DE TRANSFERT','receipt.share': 'Partager le reçu',
+    'notifications.title': 'Notifications','notifications.empty': 'Aucune notification','notifications.all': 'Toutes','notifications.unread': 'Non lues','notif.transferCompleted': 'Transfert terminé','notif.transferFailed': 'Transfert échoué',
+    'profile.title': 'Profil','profile.edit': 'Modifier le profil','profile.firstName': 'Prénom','profile.lastName': 'Nom','profile.displayName': 'Nom affiché','profile.email': 'E-mail','profile.phone': 'Téléphone','profile.country': 'Pays','profile.kyc': 'Vérification d\u2019identité','profile.security': 'Sécurité','profile.help': 'Aide','profile.logout': 'Se déconnecter',
+    'security.title': 'Sécurité','security.pin': 'Code PIN','security.setPin': 'Définir un PIN','security.changePin': 'Changer le PIN','security.biometric': 'Biométrie','security.events': 'Événements de sécurité','security.pinPrompt': 'Code PIN à 6 chiffres','security.pinSet': 'PIN défini',
+    'kyc.title': 'Vérification KYC','kyc.start': 'Commencer la vérification','kyc.status.not_started': 'Non commencé','kyc.status.draft': 'Brouillon','kyc.status.submitted': 'Soumis','kyc.status.under_review': 'En cours d\u2019examen','kyc.status.verified': 'Vérifié','kyc.status.rejected': 'Rejeté','kyc.dateOfBirth': 'Date de naissance','kyc.nationality': 'Nationalité','kyc.address': 'Adresse','kyc.docType': 'Type de document','kyc.passport': 'Passeport','kyc.nationalId': 'Carte d\u2019identité','kyc.submit': 'Soumettre',
+    'settings.title': 'Paramètres','settings.language': 'Langue','settings.theme': 'Thème','settings.theme.light': 'Clair','settings.theme.dark': 'Sombre','settings.theme.system': 'Système',
+    'errors.INVALID_PHONE': 'Numéro de téléphone invalide','errors.INVALID_AMOUNT': 'Montant invalide','errors.INSUFFICIENT_BALANCE': 'Solde insuffisant','errors.INVALID_BENEFICIARY': 'Bénéficiaire introuvable','errors.INVALID_OTP': 'Code incorrect','errors.UNKNOWN_ERROR': 'Une erreur est survenue','errors.TRANSFER_ALREADY_COMMITTED': 'Transfert déjà exécuté','errors.INVALID_ACCOUNT': 'Compte invalide','errors.PROVIDER_UNAVAILABLE': 'Indisponible','errors.BENEFICIARY_ALREADY_EXISTS': 'Bénéficiaire déjà enregistré','errors.INVALID_PIN': 'Le PIN doit contenir 6 chiffres','errors.INVALID_NAME': 'Nom invalide','errors.KYC_INVALID_DATA': 'Données invalides','errors.CRYPTO_ASSET_NOT_FOUND': 'Actif introuvable','errors.INVALID_METHOD': 'Méthode invalide'
+  },
+  en: {
+    'app.name': 'OVY Wallet',
+    'boot.tagline': 'Financial freedom within reach','boot.loading': 'Loading…',
+    'login.phone': 'Phone','login.password': 'Password','login.submit': 'Sign in','login.error': 'Invalid credentials','login.subtitle': 'Sign in to your account',
+    'login.welcome': 'Welcome','login.forgot': 'Forgot password?','login.orWith': 'Or continue with','login.noAccount': "Don't have an account?",'login.signup': 'Sign up','login.show': 'Show',
+    'nav.home': 'Home','nav.accounts': 'Accounts','nav.transfer': 'Transfer','nav.cards': 'Cards','nav.profile': 'Profile','nav.crypto': 'Crypto','nav.more': 'More',
+    'action.continue': 'Continue','action.cancel': 'Cancel','action.confirm': 'Confirm','action.save': 'Save','action.done': 'Done','action.viewAll': 'View all','action.back': 'Back','action.backHome': 'Back to home','action.copied': 'Copied',
+    'time.now': 'Just now',
+    'status.completed': 'Completed','status.failed': 'Failed','status.pending': 'Pending','status.processing': 'Processing','status.cancelled': 'Cancelled',
+    'account.OMR': 'OMR account','account.USD': 'USD account','account.EUR': 'EUR account',
+    'home.greeting': 'Hello','home.quickActions': 'Quick actions','home.recent': 'Recent transactions','home.noTx': 'No transactions yet','home.mainAccount': 'Main account','home.myAccounts': 'My accounts','home.hideBalance': 'Hide balance',
+    'accounts.title': 'Accounts','accounts.detail': 'Account detail','accounts.available': 'Available',
+    'transfer.title': 'Transfer','transfer.type': 'Type','transfer.type.local': 'Local','transfer.type.international': 'International','transfer.method': 'Method','transfer.method.mobile': 'Mobile','transfer.method.account': 'Account','transfer.method.bank': 'Bank','transfer.method.card': 'Card','transfer.method.wallet': 'Wallet','transfer.beneficiary': 'Beneficiary','transfer.phone': 'Phone number','transfer.recognize': 'Searching…','transfer.searching': 'Searching…','transfer.recognizing': 'Recognizing…','transfer.found': 'Beneficiary found','transfer.notFound': 'Beneficiary not found','transfer.checkNumber': 'Check the number you entered','transfer.enterNumber': 'Enter a number to look up the beneficiary','transfer.sourceAccount': 'Source account','transfer.amount': 'Amount','transfer.fees': 'Fees','transfer.feeEstimate': 'Estimated fees','transfer.total': 'Total','transfer.review': 'Review','transfer.otp': 'Verification code','transfer.otpHint': 'Enter the 6-digit code','transfer.processing': 'Processing…','transfer.processingTitle': 'Your transfer is being processed…','transfer.processingSub': 'Please wait, this will only take a moment.','transfer.success': 'Transfer successful','transfer.sentOk': 'Sent successfully','transfer.receipt': 'View receipt','transfer.resume': 'Resume transfer',
+    'beneficiaries.title': 'Beneficiaries','beneficiaries.empty': 'No beneficiaries','beneficiaries.add': 'Add beneficiary','beneficiaries.name': 'Full name','beneficiaries.phone': 'Phone','beneficiaries.account': 'Account number','beneficiaries.iban': 'IBAN','beneficiaries.bank': 'Bank','beneficiaries.country': 'Country','beneficiaries.currency': 'Currency',
+    'cards.title': 'Cards','cards.detail': 'Card detail','cards.empty': 'No cards','cards.createVirtual': 'Create virtual card','cards.holder': 'Cardholder','cards.activate': 'Activate','cards.freeze': 'Freeze','cards.unfreeze': 'Unfreeze','cards.close': 'Close','cards.physical': 'Physical','cards.virtual': 'Virtual','cards.status.active': 'Active','cards.status.frozen': 'Frozen','cards.status.inactive': 'Inactive','cards.status.closed': 'Closed',
+    'crypto.title': 'Crypto','crypto.total': 'Total value','crypto.createWallet': 'Create wallet','crypto.noWallet': 'No wallet yet','crypto.walletCreated': 'Wallet created','crypto.assets': 'Assets',
+    'more.title': 'More','more.securityTitle': 'Your security','more.securitySub': 'Our priority',
+    'services.title': 'Services','services.bills': 'Bills','services.topup': 'Mobile Top Up','services.internet': 'Internet','services.utilities': 'Utilities','services.subscriptions': 'Subscriptions','services.government': 'Government','services.other': 'Other services','services.unavailable': 'Service unavailable',
+    'history.title': 'History','history.empty': 'No transactions','history.today': 'Today','history.yesterday': 'Yesterday','history.all': 'All','history.transfers': 'Transfers',
+    'tx.detail': 'Transaction detail','tx.recipient': 'Recipient','tx.from': 'From','tx.amount': 'Amount','tx.fee': 'Fee','tx.total': 'Total','tx.reference': 'Reference','tx.date': 'Date','tx.status': 'Status','tx.id': 'Transaction ID',
+    'receipt.title': 'Receipt','receipt.heading': 'TRANSFER RECEIPT','receipt.share': 'Share receipt',
+    'notifications.title': 'Notifications','notifications.empty': 'No notifications','notifications.all': 'All','notifications.unread': 'Unread','notif.transferCompleted': 'Transfer completed','notif.transferFailed': 'Transfer failed',
+    'profile.title': 'Profile','profile.edit': 'Edit profile','profile.firstName': 'First name','profile.lastName': 'Last name','profile.displayName': 'Display name','profile.email': 'Email','profile.phone': 'Phone','profile.country': 'Country','profile.kyc': 'Identity verification','profile.security': 'Security','profile.help': 'Help','profile.logout': 'Log out',
+    'security.title': 'Security','security.pin': 'PIN code','security.setPin': 'Set PIN','security.changePin': 'Change PIN','security.biometric': 'Biometrics','security.events': 'Security events','security.pinPrompt': '6-digit PIN','security.pinSet': 'PIN set',
+    'kyc.title': 'KYC verification','kyc.start': 'Start verification','kyc.status.not_started': 'Not started','kyc.status.draft': 'Draft','kyc.status.submitted': 'Submitted','kyc.status.under_review': 'Under review','kyc.status.verified': 'Verified','kyc.status.rejected': 'Rejected','kyc.dateOfBirth': 'Date of birth','kyc.nationality': 'Nationality','kyc.address': 'Address','kyc.docType': 'Document type','kyc.passport': 'Passport','kyc.nationalId': 'National ID','kyc.submit': 'Submit',
+    'settings.title': 'Settings','settings.language': 'Language','settings.theme': 'Theme','settings.theme.light': 'Light','settings.theme.dark': 'Dark','settings.theme.system': 'System',
+    'errors.INVALID_PHONE': 'Invalid phone number','errors.INVALID_AMOUNT': 'Invalid amount','errors.INSUFFICIENT_BALANCE': 'Insufficient balance','errors.INVALID_BENEFICIARY': 'Beneficiary not found','errors.INVALID_OTP': 'Incorrect code','errors.UNKNOWN_ERROR': 'Something went wrong','errors.TRANSFER_ALREADY_COMMITTED': 'Transfer already executed','errors.INVALID_ACCOUNT': 'Invalid account','errors.PROVIDER_UNAVAILABLE': 'Unavailable','errors.BENEFICIARY_ALREADY_EXISTS': 'Beneficiary already saved','errors.INVALID_PIN': 'PIN must be 6 digits','errors.INVALID_NAME': 'Invalid name','errors.KYC_INVALID_DATA': 'Invalid data','errors.CRYPTO_ASSET_NOT_FOUND': 'Asset not found','errors.INVALID_METHOD': 'Invalid method'
+  },
+  ar: {
+    'app.name': 'محفظة OVY',
+    'boot.tagline': 'حرية مالية في متناول يدك','boot.loading': 'جارٍ التحميل…',
+    'login.phone': 'رقم الهاتف','login.password': 'كلمة المرور','login.submit': 'تسجيل الدخول','login.error': 'بيانات غير صحيحة','login.subtitle': 'سجّل الدخول إلى حسابك',
+    'login.welcome': 'مرحباً بك','login.forgot': 'نسيت كلمة المرور؟','login.orWith': 'أو تابع عبر','login.noAccount': 'ليس لديك حساب؟','login.signup': 'إنشاء حساب','login.show': 'إظهار',
+    'nav.home': 'الرئيسية','nav.accounts': 'الحسابات','nav.transfer': 'تحويل','nav.cards': 'البطاقات','nav.profile': 'الملف','nav.crypto': 'رقمية','nav.more': 'المزيد',
+    'action.continue': 'متابعة','action.cancel': 'إلغاء','action.confirm': 'تأكيد','action.save': 'حفظ','action.done': 'تم','action.viewAll': 'عرض الكل','action.back': 'رجوع','action.backHome': 'العودة إلى الرئيسية','action.copied': 'تم النسخ',
+    'time.now': 'الآن',
+    'status.completed': 'مكتمل','status.failed': 'فشل','status.pending': 'قيد الانتظار','status.processing': 'قيد المعالجة','status.cancelled': 'ملغى',
+    'account.OMR': 'حساب OMR','account.USD': 'حساب USD','account.EUR': 'حساب EUR',
+    'home.greeting': 'مرحباً','home.quickActions': 'إجراءات سريعة','home.recent': 'العمليات الأخيرة','home.noTx': 'لا توجد عمليات','home.mainAccount': 'الحساب الرئيسي','home.myAccounts': 'حساباتي','home.hideBalance': 'إخفاء الرصيد',
+    'accounts.title': 'الحسابات','accounts.detail': 'تفاصيل الحساب','accounts.available': 'متاح',
+    'transfer.title': 'تحويل','transfer.type': 'النوع','transfer.type.local': 'محلي','transfer.type.international': 'دولي','transfer.method': 'الطريقة','transfer.method.mobile': 'جوال','transfer.method.account': 'حساب','transfer.method.bank': 'بنك','transfer.method.card': 'بطاقة','transfer.method.wallet': 'محفظة','transfer.beneficiary': 'المستفيد','transfer.phone': 'رقم الجوال','transfer.recognize': 'جارٍ البحث…','transfer.searching': 'جارٍ البحث…','transfer.recognizing': 'جارٍ التعرف…','transfer.found': 'تم العثور على المستفيد','transfer.notFound': 'المستفيد غير موجود','transfer.checkNumber': 'تحقق من الرقم المدخل','transfer.enterNumber': 'أدخل رقماً للبحث عن المستفيد','transfer.sourceAccount': 'الحساب المصدر','transfer.amount': 'المبلغ','transfer.fees': 'الرسوم','transfer.feeEstimate': 'الرسوم المقدّرة','transfer.total': 'الإجمالي','transfer.review': 'المراجعة','transfer.otp': 'رمز التحقق','transfer.otpHint': 'أدخل الرمز المكون من 6 أرقام','transfer.processing': 'جارٍ المعالجة…','transfer.processingTitle': 'جارٍ معالجة التحويل…','transfer.processingSub': 'يرجى الانتظار، سيستغرق الأمر لحظات.','transfer.success': 'تم التحويل بنجاح','transfer.sentOk': 'تم الإرسال بنجاح','transfer.receipt': 'عرض الإيصال','transfer.resume': 'متابعة التحويل',
+    'beneficiaries.title': 'المستفيدون','beneficiaries.empty': 'لا يوجد مستفيدون','beneficiaries.add': 'إضافة مستفيد','beneficiaries.name': 'الاسم الكامل','beneficiaries.phone': 'الجوال','beneficiaries.account': 'رقم الحساب','beneficiaries.iban': 'الآيبان','beneficiaries.bank': 'البنك','beneficiaries.country': 'الدولة','beneficiaries.currency': 'العملة',
+    'cards.title': 'البطاقات','cards.detail': 'تفاصيل البطاقة','cards.empty': 'لا توجد بطاقات','cards.createVirtual': 'إنشاء بطاقة افتراضية','cards.holder': 'حامل البطاقة','cards.activate': 'تفعيل','cards.freeze': 'تجميد','cards.unfreeze': 'إلغاء التجميد','cards.close': 'إغلاق','cards.physical': 'فيزيائية','cards.virtual': 'افتراضية','cards.status.active': 'نشطة','cards.status.frozen': 'مجمّدة','cards.status.inactive': 'غير مفعلة','cards.status.closed': 'مغلقة',
+    'crypto.title': 'العملات الرقمية','crypto.total': 'القيمة الإجمالية','crypto.createWallet': 'إنشاء محفظة','crypto.noWallet': 'لا توجد محفظة','crypto.walletCreated': 'تم إنشاء المحفظة','crypto.assets': 'الأصول',
+    'more.title': 'المزيد','more.securityTitle': 'أمانك','more.securitySub': 'أولويتنا',
+    'services.title': 'الخدمات','services.bills': 'الفواتير','services.topup': 'تعبئة الجوال','services.internet': 'الإنترنت','services.utilities': 'المرافق','services.subscriptions': 'الاشتراكات','services.government': 'الخدمات الحكومية','services.other': 'خدمات أخرى','services.unavailable': 'الخدمة غير متوفرة',
+    'history.title': 'السجل','history.empty': 'لا توجد عمليات','history.today': 'اليوم','history.yesterday': 'أمس','history.all': 'الكل','history.transfers': 'التحويلات',
+    'tx.detail': 'تفاصيل العملية','tx.recipient': 'المستلم','tx.from': 'من','tx.amount': 'المبلغ','tx.fee': 'الرسوم','tx.total': 'الإجمالي','tx.reference': 'المرجع','tx.date': 'التاريخ','tx.status': 'الحالة','tx.id': 'رقم العملية',
+    'receipt.title': 'الإيصال','receipt.heading': 'إيصال التحويل','receipt.share': 'مشاركة الإيصال',
+    'notifications.title': 'الإشعارات','notifications.empty': 'لا توجد إشعارات','notifications.all': 'الكل','notifications.unread': 'غير المقروءة','notif.transferCompleted': 'اكتمل التحويل','notif.transferFailed': 'فشل التحويل',
+    'profile.title': 'الملف الشخصي','profile.edit': 'تعديل الملف','profile.firstName': 'الاسم الأول','profile.lastName': 'اسم العائلة','profile.displayName': 'اسم العرض','profile.email': 'البريد الإلكتروني','profile.phone': 'الجوال','profile.country': 'الدولة','profile.kyc': 'التحقق من الهوية','profile.security': 'الأمان','profile.help': 'مساعدة','profile.logout': 'تسجيل الخروج',
+    'security.title': 'الأمان','security.pin': 'رمز PIN','security.setPin': 'تعيين PIN','security.changePin': 'تغيير PIN','security.biometric': 'البصمة','security.events': 'أحداث الأمان','security.pinPrompt': 'رمز PIN من 6 أرقام','security.pinSet': 'تم تعيين PIN',
+    'kyc.title': 'التحقق من الهوية','kyc.start': 'بدء التحقق','kyc.status.not_started': 'لم يبدأ','kyc.status.draft': 'مسودة','kyc.status.submitted': 'تم الإرسال','kyc.status.under_review': 'قيد المراجعة','kyc.status.verified': 'موثّق','kyc.status.rejected': 'مرفوض','kyc.dateOfBirth': 'تاريخ الميلاد','kyc.nationality': 'الجنسية','kyc.address': 'العنوان','kyc.docType': 'نوع الوثيقة','kyc.passport': 'جواز السفر','kyc.nationalId': 'بطاقة الهوية','kyc.submit': 'إرسال',
+    'settings.title': 'الإعدادات','settings.language': 'اللغة','settings.theme': 'المظهر','settings.theme.light': 'فاتح','settings.theme.dark': 'داكن','settings.theme.system': 'النظام',
+    'errors.INVALID_PHONE': 'رقم الجوال غير صالح','errors.INVALID_AMOUNT': 'المبلغ غير صالح','errors.INSUFFICIENT_BALANCE': 'الرصيد غير كافٍ','errors.INVALID_BENEFICIARY': 'المستفيد غير موجود','errors.INVALID_OTP': 'الرمز غير صحيح','errors.UNKNOWN_ERROR': 'حدث خطأ','errors.TRANSFER_ALREADY_COMMITTED': 'تم التحويل مسبقاً','errors.INVALID_ACCOUNT': 'حساب غير صالح','errors.PROVIDER_UNAVAILABLE': 'غير متوفر','errors.BENEFICIARY_ALREADY_EXISTS': 'المستفيد مسجل مسبقاً','errors.INVALID_PIN': 'يجب أن يتكون PIN من 6 أرقام','errors.INVALID_NAME': 'اسم غير صالح','errors.KYC_INVALID_DATA': 'بيانات غير صالحة','errors.CRYPTO_ASSET_NOT_FOUND': 'الأصل غير موجود','errors.INVALID_METHOD': 'طريقة غير صالحة'
+  }
+};
+let currentLang = 'fr';
+function t(key){
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.fr;
+  return dict[key] || TRANSLATIONS.en[key] || key;
+}
+function locale(){ return currentLang === 'ar' ? 'ar' : currentLang === 'en' ? 'en-GB' : 'fr-FR'; }
+function errText(e){ return t('errors.' + ((e && e.code) || 'UNKNOWN_ERROR')); }
+function accLabel(a){
+  if (!a) return '—';
+  const k = 'account.' + a.currency;
+  const v = t(k);
+  return v === k ? (a.name || a.currency) : v;
+}
+
+/* ==========================================================================
+   THEME
+   ========================================================================== */
+const ThemeEngine = {
+  apply(mode){
+    let effective = mode;
+    if (mode === 'system'){
+      effective = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', effective);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', effective === 'dark' ? '#060606' : '#FFFFFF');
+  }
+};
+
+/* ==========================================================================
+   CREDENTIALS + DEV OTP
+   ========================================================================== */
+const PRIMARY_ACCOUNT = {
+  phone: '98890593',
+  password: '050069',
+  holder: 'Fesal Abkar Said',
+  firstName: 'Fesal',
+  lastName: 'Abkar Said'
+};
+const DEV_OTP = '050069';
+
+/* ==========================================================================
+   SESSION ENGINE
+   ========================================================================== */
+const SessionEngine = {
+  get(){ return StorageEngine.getSync('session') || { authenticated: false }; },
+  async login(phone){
+    await StorageEngine.set('session', { authenticated: true, phone, loginAt: Date.now() });
+  },
+  async logout(){
+    await StorageEngine.set('session', { authenticated: false, phone: null, loginAt: null });
+  },
+  isAuthenticated(){
+    const s = SessionEngine.get();
+    return !!s.authenticated;
+  }
+};
+
+/* ==========================================================================
+   ENGINES
+   ========================================================================== */
+
+/* -------- AccountEngine -------- */
+const AccountEngine = {
+  getAll(){ return StorageEngine.getSync('accounts') || []; },
+  getById(id){ return AccountEngine.getAll().find(a => a.id === id) || null; },
+  async ensureDefaults(){
+    const existing = AccountEngine.getAll();
+    if (existing && existing.length > 0) return;
+    const now = Date.now();
+    const fresh = [
+      { id:'acc_omr', type:'fiat', currency:'OMR', balance:967, availableBalance:967, status:'active', name:'OMR Account', createdAt:now },
+      { id:'acc_usd', type:'fiat', currency:'USD', balance:0, availableBalance:0, status:'active', name:'USD Account', createdAt:now },
+      { id:'acc_eur', type:'fiat', currency:'EUR', balance:0, availableBalance:0, status:'active', name:'EUR Account', createdAt:now }
+    ];
+    await StorageEngine.set('accounts', fresh);
+  },
+  async credit(id, amount, meta){
+    const list = AccountEngine.getAll();
+    const i = list.findIndex(a => a.id === id);
+    if (i === -1) throw { code:'INVALID_ACCOUNT' };
+    const acc = list[i];
+    const cur = acc.currency;
+    const before = acc.balance;
+    acc.balance = Money.add(acc.balance, amount, cur);
+    acc.availableBalance = Money.add(acc.availableBalance, amount, cur);
+    list[i] = acc;
+    await StorageEngine.set('accounts', list);
+    await AccountEngine._ledger('credit', acc, amount, before, acc.balance, meta);
+    EventBus.emit('accountChanged', acc);
+    return acc;
+  },
+  async debit(id, amount, meta){
+    const list = AccountEngine.getAll();
+    const i = list.findIndex(a => a.id === id);
+    if (i === -1) throw { code:'INVALID_ACCOUNT' };
+    const acc = list[i];
+    const cur = acc.currency;
+    // idempotence : un transfert déjà débité ne l'est jamais une seconde fois
+    if (meta && meta.transferId){
+      const ledger = StorageEngine.getSync('ledger') || [];
+      if (ledger.some(l => l.transferId === meta.transferId && l.type === 'debit')) return acc;
+    }
+    if (!Money.gte(acc.availableBalance, amount, cur)) throw { code:'INSUFFICIENT_BALANCE' };
+    const before = acc.balance;
+    acc.balance = Money.sub(acc.balance, amount, cur);
+    acc.availableBalance = Money.sub(acc.availableBalance, amount, cur);
+    list[i] = acc;
+    await StorageEngine.set('accounts', list);
+    await AccountEngine._ledger('debit', acc, amount, before, acc.balance, meta);
+    EventBus.emit('accountChanged', acc);
+    return acc;
+  },
+  async _ledger(type, acc, amount, before, after, meta){
+    const ledger = StorageEngine.getSync('ledger') || [];
+    ledger.unshift({ id: Ids.evt(), transactionId: (meta && meta.transactionId) || null, transferId: (meta && meta.transferId) || null, accountId: acc.id, type, amount, currency: acc.currency, balanceBefore: before, balanceAfter: after, createdAt: Date.now() });
+    await StorageEngine.set('ledger', ledger);
+  },
+  hasSufficientBalance(id, amount){
+    const acc = AccountEngine.getById(id);
+    if (!acc) return false;
+    return Money.gte(acc.availableBalance, amount, acc.currency);
+  }
+};
+
+/* -------- BeneficiaryEngine -------- */
+const BeneficiaryEngine = {
+  getAll(){ return StorageEngine.getSync('beneficiaries') || []; },
+  getById(id){ return BeneficiaryEngine.getAll().find(b => b.id === id) || null; },
+  findByPhone(phone){
+    const n = normalizePhone(phone);
+    if (!n) return null;
+    return BeneficiaryEngine.getAll().find(b => phonesMatch(b.phone, n)) || null;
+  },
+  findByIdentifier(idf){
+    if (!idf) return null;
+    const v = String(idf).trim();
+    return BeneficiaryEngine.findByPhone(v) ||
+      BeneficiaryEngine.getAll().find(b => (b.accountNumber && b.accountNumber === v) || (b.iban && b.iban.replace(/\s/g,'') === v.replace(/\s/g,''))) || null;
+  },
+  resolve(identifier){
+    if (!identifier || String(identifier).trim().length < 4) return { state:'error' };
+    const found = BeneficiaryEngine.findByIdentifier(identifier);
+    if (!found) return { state:'not_found' };
+    return { state:'found', data: found, maskedName: found.maskedName };
+  },
+  async add(input){
+    if (!input.name || input.name.trim().length < 2) throw { code:'INVALID_NAME' };
+    if (!input.phone || !normalizePhone(input.phone)) throw { code:'INVALID_PHONE' };
+    const existing = BeneficiaryEngine.findByPhone(input.phone);
+    if (existing) throw { code:'BENEFICIARY_ALREADY_EXISTS' };
+    const b = {
+      id: Ids.ben(), name: input.name.trim(), maskedName: maskName(input.name.trim()),
+      phone: normalizePhone(input.phone), phoneRaw: String(input.phone).trim(),
+      accountNumber: input.accountNumber || null, iban: input.iban || null,
+      bank: input.bank || null, country: input.country || null,
+      currency: input.currency || 'OMR', type: input.type || 'mobile',
+      favorite: false, status: 'active', createdAt: Date.now()
+    };
+    const list = BeneficiaryEngine.getAll().slice();
+    list.push(b);
+    await StorageEngine.set('beneficiaries', list);
+    EventBus.emit('beneficiaryChanged', b);
+    return b;
+  }
+};
+
+/* -------- FeeService -------- */
+const FeeService = {
+  calculate({ type, method, amount }){
+    if (!amount || amount <= 0) return 0;
+    if (type === 'local'){
+      if (method === 'mobile')  return 0;
+      if (method === 'account') return 0.1;
+      if (method === 'card')    return 0.2;
+    }
+    if (type === 'international'){
+      if (method === 'bank')   return 1.0;
+      if (method === 'wallet') return 0.5;
+    }
+    return 0;
+  }
+};
+
+/* -------- TransactionEngine -------- */
+const TransactionEngine = {
+  getAll(){ return StorageEngine.getSync('transactions') || []; },
+  getById(id){ return TransactionEngine.getAll().find(t => t.id === id) || null; },
+  getByTransferId(tid){ return TransactionEngine.getAll().find(t => t.transferId === tid) || null; },
+  getByAccount(aid){ return TransactionEngine.getAll().filter(t => t.sourceAccountId === aid); },
+  nextId(){ return Ids.transaction(); },
+  async create(input){
+    const existing = TransactionEngine.getByTransferId(input.transferId);
+    if (existing) return existing;
+    const total = Money.add(input.amount, input.fee || 0, input.currency);
+    const now = Date.now();
+    const tx = {
+      id: input.idOverride || Ids.transaction(),
+      transferId: input.transferId, reference: input.reference,
+      type: input.type, method: input.method, direction: input.direction || 'debit',
+      label: 'Transfer to ' + (input.beneficiaryMaskedName || '—'),
+      counterparty: input.beneficiaryMaskedName || '',
+      amount: input.amount, currency: input.currency,
+      fee: input.fee || 0, total,
+      sourceAccountId: input.sourceAccountId || null,
+      sourceCurrency: input.sourceCurrency || input.currency,
+      sourceAccountName: input.sourceAccountName || '',
+      beneficiaryId: input.beneficiaryId || null,
+      beneficiaryName: input.beneficiaryName || null,
+      beneficiaryMaskedName: input.beneficiaryMaskedName || null,
+      beneficiaryPhone: input.beneficiaryPhone || null,
+      balanceBefore: null, balanceAfter: null,
+      date: now, createdAt: now, completedAt: now,
+      status: input.status || 'completed'
+    };
+    const list = TransactionEngine.getAll().slice();
+    list.unshift(tx);
+    await StorageEngine.set('transactions', list);
+    EventBus.emit('transactionCreated', tx);
+    return tx;
+  },
+  async attachBalances(id, before, after){
+    const list = TransactionEngine.getAll().slice();
+    const i = list.findIndex(t => t.id === id);
+    if (i === -1) return null;
+    list[i] = { ...list[i], balanceBefore: before, balanceAfter: after };
+    await StorageEngine.set('transactions', list);
+    return list[i];
+  }
+};
+
+/* -------- ReceiptEngine -------- */
+const ReceiptEngine = {
+  generate(transactionId){
+    const tx = TransactionEngine.getById(transactionId);
+    if (!tx) throw { code:'UNKNOWN_ERROR' };
+    const acc = tx.sourceAccountId ? AccountEngine.getById(tx.sourceAccountId) : null;
+    return {
+      wallet: 'OVY Wallet', title: t('receipt.heading'),
+      status: t('status.' + tx.status),
+      statusRaw: tx.status,
+      recipientPhone: tx.beneficiaryPhone || '—',
+      recipientMaskedName: tx.beneficiaryMaskedName || '—',
+      fromAccountName: acc ? accLabel(acc) : (tx.sourceAccountName || '—'),
+      amountFormatted: Money.format(tx.amount, tx.currency),
+      feeFormatted: Money.format(tx.fee, tx.currency),
+      totalFormatted: Money.format(tx.total, tx.currency),
+      reference: tx.reference,
+      dateHuman: new Date(tx.date).toLocaleString(locale(), { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }),
+      transactionId: tx.id, transferId: tx.transferId
+    };
+  }
+};
+
+/* -------- NotificationEngine -------- */
+const NotificationEngine = {
+  getAll(){ return StorageEngine.getSync('notifications') || []; },
+  getById(id){ return NotificationEngine.getAll().find(n => n.id === id) || null; },
+  getUnread(){ return NotificationEngine.getAll().filter(n => !n.read); },
+  countUnread(){ return NotificationEngine.getUnread().length; },
+  async create(input){
+    if (input.transactionId){
+      const existing = NotificationEngine.getAll().find(n => n.transactionId === input.transactionId && n.type === input.type);
+      if (existing) return existing;
+    }
+    const n = {
+      id: Ids.notif(), type: input.type, title: input.title, titleKey: input.titleKey || null, message: input.message,
+      transactionId: input.transactionId || null, transferId: input.transferId || null,
+      amount: input.amount || null, currency: input.currency || null,
+      beneficiaryPhone: input.beneficiaryPhone || null,
+      beneficiaryMaskedName: input.beneficiaryMaskedName || null,
+      status: input.status || 'info', read: false, createdAt: Date.now()
+    };
+    const list = NotificationEngine.getAll().slice();
+    list.unshift(n);
+    await StorageEngine.set('notifications', list);
+    EventBus.emit('unreadChanged', NotificationEngine.countUnread());
+    return n;
+  },
+  async createFromTransaction(tx){
+    const ok = tx.status === 'completed';
+    return NotificationEngine.create({
+      type: ok ? 'transfer_completed' : 'transfer_failed',
+      titleKey: ok ? 'notif.transferCompleted' : 'notif.transferFailed',
+      title: t(ok ? 'notif.transferCompleted' : 'notif.transferFailed'),
+      message: (tx.beneficiaryPhone||'') + '\n' + (tx.beneficiaryMaskedName||'') + '\n' + Money.format(tx.amount, tx.currency),
+      transactionId: tx.id, transferId: tx.transferId, amount: tx.amount, currency: tx.currency,
+      beneficiaryPhone: tx.beneficiaryPhone, beneficiaryMaskedName: tx.beneficiaryMaskedName, status: ok ? 'success' : 'error'
+    });
+  },
+  async markAsRead(id){
+    const list = NotificationEngine.getAll();
+    const i = list.findIndex(n => n.id === id);
+    if (i === -1) return null;
+    if (list[i].read) return list[i];
+    const next = list.slice();
+    next[i] = { ...list[i], read: true };
+    await StorageEngine.set('notifications', next);
+    EventBus.emit('unreadChanged', NotificationEngine.countUnread());
+    return next[i];
+  },
+  async markAllAsRead(){
+    const list = NotificationEngine.getAll();
+    let changed = false;
+    const next = list.map(n => { if (!n.read){ changed = true; return { ...n, read: true }; } return n; });
+    if (!changed) return;
+    await StorageEngine.set('notifications', next);
+    EventBus.emit('unreadChanged', 0);
+  }
+};
+
+/* -------- NotificationPresentationQueue -------- */
+const PresentationQueue = (() => {
+  const queue = [];
+  let current = null;
+  const layer = document.getElementById('ovy-banner-layer');
+  function render(){
+    layer.innerHTML = '';
+    if (!current) return;
+    const el = document.createElement('div');
+    el.className = 'ovy-banner';
+    el.setAttribute('role', 'status');
+    el.innerHTML =
+      '<div class="ovy-banner__icon">' + svg('check') + '</div>' +
+      '<div class="ovy-banner__body">' +
+        '<div class="ovy-banner__title">' + esc(current.title) + '</div>' +
+        '<div class="ovy-banner__line">' + esc(current.phone) + '</div>' +
+        '<div class="ovy-banner__line">' + esc(current.maskedName) + '</div>' +
+        '<div class="ovy-banner__amount ovy-num">' + esc(current.amount) + '</div>' +
+      '</div>' +
+      '<button class="ovy-banner__close" aria-label="Close">' + svg('close', 14) + '</button>';
+    el.querySelector('.ovy-banner__body').addEventListener('click', () => {
+      const txId = current && current.transactionId;
+      dismiss();
+      if (txId) go('#/transaction/' + txId);
+    });
+    el.querySelector('.ovy-banner__close').addEventListener('click', dismiss);
+    layer.appendChild(el);
+  }
+  function next(){ current = queue.shift() || null; render(); }
+  function dismiss(){ current = null; render(); if (queue.length) setTimeout(next, 120); }
+  return {
+    enqueue(p){
+      if (current && current.id === p.id) return;
+      if (queue.some(x => x.id === p.id)) return;
+      queue.push(p);
+      if (!current) next();
+    },
+    dismiss
+  };
+})();
+
+/* -------- TransferEngine (seul point d'entrée pour créer un transfert) -------- */
+const TransferEngine = (() => {
+  const METHODS = { local:['mobile','account','card'], international:['bank','wallet'] };
+  let state = defaultState();
+  let inflight = null;
+  function defaultState(){
+    return {
+      transferId:null, type:null, method:null,
+      sourceAccountId:null, sourceCurrency:null, sourceBalance:0,
+      beneficiaryId:null, beneficiaryName:null, beneficiaryMaskedName:null,
+      beneficiaryPhone:null, beneficiaryCurrency:null,
+      amount:0, fee:0, total:0,
+      reference:null, status:'draft', currentStep:'type',
+      otpAttempts:0, otpVerified:false, committed:false,
+      transactionId:null, createdAt:null, completedAt:null
+    };
+  }
+  function set(patch){ state = { ...state, ...patch }; EventBus.emit('transferState', state); }
+  function locked(){ return state.committed || ['processing','success'].includes(state.currentStep); }
+  // toute modification en amont invalide l'OTP et les frais déjà calculés
+  const RESET_DOWNSTREAM = { fee:0, total:0, status:'draft', otpVerified:false, otpAttempts:0 };
+  return {
+    getState(){ return state; },
+    getMethods(type){ return (METHODS[type] || []).slice(); },
+    start(){
+      state = defaultState();
+      set({ transferId: Ids.transfer(), reference: Ids.reference(), status:'draft', currentStep:'type', createdAt: Date.now() });
+    },
+    setType(type){
+      if (!METHODS[type]) throw { code:'INVALID_METHOD' };
+      if (locked()) throw { code:'TRANSFER_ALREADY_COMMITTED' };
+      const keep = state.type === type;
+      set({ type, method: keep ? state.method : null, ...RESET_DOWNSTREAM, currentStep: keep && state.method ? state.currentStep : 'method' });
+    },
+    setMethod(method){
+      if (!state.type || !METHODS[state.type].includes(method)) throw { code:'INVALID_METHOD' };
+      if (locked()) throw { code:'TRANSFER_ALREADY_COMMITTED' };
+      set({ method, ...RESET_DOWNSTREAM, currentStep:'beneficiary' });
+    },
+    setBeneficiary(b){
+      if (locked()) throw { code:'TRANSFER_ALREADY_COMMITTED' };
+      if (!b || !b.id) throw { code:'INVALID_BENEFICIARY' };
+      set({
+        beneficiaryId: b.id, beneficiaryName: b.name, beneficiaryMaskedName: b.maskedName,
+        beneficiaryPhone: b.phoneRaw || b.phone, beneficiaryCurrency: b.currency,
+        ...RESET_DOWNSTREAM, currentStep:'source_account'
+      });
+    },
+    setSourceAccount(id){
+      const acc = AccountEngine.getById(id);
+      if (!acc) throw { code:'INVALID_ACCOUNT' };
+      if (locked()) throw { code:'TRANSFER_ALREADY_COMMITTED' };
+      set({ sourceAccountId: acc.id, sourceCurrency: acc.currency, sourceBalance: acc.availableBalance, amount: 0, ...RESET_DOWNSTREAM, currentStep:'amount' });
+    },
+    setAmount(amount){
+      if (locked()) throw { code:'TRANSFER_ALREADY_COMMITTED' };
+      if (typeof amount !== 'number' || isNaN(amount) || !isFinite(amount) || amount <= 0) throw { code:'INVALID_AMOUNT' };
+      if (!state.sourceCurrency || !Money.hasValidPrecision(amount, state.sourceCurrency)) throw { code:'INVALID_AMOUNT' };
+      set({ amount, ...RESET_DOWNSTREAM, currentStep:'fees' });
+    },
+    previewFee(amount){
+      return FeeService.calculate({ type: state.type, method: state.method, amount });
+    },
+    calculateFees(){
+      const { type, method, amount, sourceCurrency } = state;
+      if (!type || !method || !amount || !sourceCurrency) throw { code:'UNKNOWN_ERROR' };
+      const fee = FeeService.calculate({ type, method, amount });
+      const total = Money.add(amount, fee, sourceCurrency);
+      set({ fee, total, currentStep:'confirmation' });
+      return { fee, total };
+    },
+    validate(){
+      const s = state;
+      if (!s.transferId) return { ok:false, error:'UNKNOWN_ERROR' };
+      if (!s.type) return { ok:false, error:'INVALID_METHOD' };
+      if (!s.method) return { ok:false, error:'INVALID_METHOD' };
+      if (!s.beneficiaryId) return { ok:false, error:'INVALID_BENEFICIARY' };
+      if (!s.sourceAccountId) return { ok:false, error:'INVALID_ACCOUNT' };
+      if (!s.amount || s.amount <= 0) return { ok:false, error:'INVALID_AMOUNT' };
+      const acc = AccountEngine.getById(s.sourceAccountId);
+      if (!acc) return { ok:false, error:'INVALID_ACCOUNT' };
+      if (acc.currency !== s.sourceCurrency) return { ok:false, error:'INVALID_ACCOUNT' };
+      const expected = Money.add(s.amount, FeeService.calculate({ type:s.type, method:s.method, amount:s.amount }), s.sourceCurrency);
+      if (!Money.eq(expected, s.total, s.sourceCurrency)) return { ok:false, error:'INVALID_AMOUNT' };
+      if (!Money.gte(acc.availableBalance, s.total, s.sourceCurrency)) return { ok:false, error:'INSUFFICIENT_BALANCE' };
+      const committed = StorageEngine.getSync('committedTransfers') || [];
+      if (committed.includes(s.transferId)) return { ok:false, error:'TRANSFER_ALREADY_COMMITTED' };
+      return { ok:true };
+    },
+    confirm(){
+      if (state.committed) throw { code:'TRANSFER_ALREADY_COMMITTED' };
+      const v = TransferEngine.validate();
+      if (!v.ok) throw { code: v.error };
+      set({ status:'pending', currentStep:'otp', otpAttempts:0, otpVerified:false });
+    },
+    verifyOTP(code){
+      if (state.committed) return { ok:true };
+      if (typeof code !== 'string' || !/^\d{6}$/.test(code) || code !== DEV_OTP){
+        set({ otpAttempts: state.otpAttempts + 1 });
+        return { ok:false, error:'INVALID_OTP' };
+      }
+      set({ otpVerified:true, currentStep:'processing', status:'processing' });
+      return { ok:true };
+    },
+    // Le débit n'a lieu qu'ici, une seule fois. Les appels concurrents partagent la même promesse.
+    commit(){
+      if (inflight) return inflight;
+      inflight = TransferEngine._commit()
+        .catch(e => {
+          // échec avant le débit : on rouvre le flux à la confirmation, l'OTP devra être ressaisi
+          if (!state.committed) set({ currentStep:'confirmation', status:'draft', otpVerified:false });
+          throw e;
+        })
+        .finally(() => { inflight = null; });
+      return inflight;
+    },
+    async _commit(){
+      const s = state;
+      if (s.committed && s.transactionId) return ReceiptEngine.generate(s.transactionId);
+      const committed = (StorageEngine.getSync('committedTransfers') || []).slice();
+      if (committed.includes(s.transferId)){
+        const existing = TransactionEngine.getByTransferId(s.transferId);
+        if (existing){
+          set({ committed:true, transactionId: existing.id, status:'completed', currentStep:'success', completedAt: Date.now() });
+          return ReceiptEngine.generate(existing.id);
+        }
+      }
+      const v = TransferEngine.validate();
+      if (!v.ok) throw { code: v.error };
+      if (!s.otpVerified) throw { code:'INVALID_OTP' };
+      const acc = AccountEngine.getById(s.sourceAccountId);
+      if (!acc) throw { code:'INVALID_ACCOUNT' };
+
+      const txId = TransactionEngine.nextId();
+      const balanceBefore = acc.balance;
+      await AccountEngine.debit(s.sourceAccountId, s.total, { transferId: s.transferId, transactionId: txId });
+      const balanceAfter = (AccountEngine.getById(s.sourceAccountId) || {}).balance || 0;
+
+      const tx = await TransactionEngine.create({
+        idOverride: txId, transferId: s.transferId, type: 'transfer', method: s.method, direction: 'debit',
+        sourceAccountId: s.sourceAccountId, sourceCurrency: s.sourceCurrency, sourceAccountName: acc.name,
+        beneficiaryId: s.beneficiaryId, beneficiaryName: s.beneficiaryName,
+        beneficiaryMaskedName: s.beneficiaryMaskedName, beneficiaryPhone: s.beneficiaryPhone,
+        amount: s.amount, currency: s.sourceCurrency, fee: s.fee, reference: s.reference
+      });
+      await TransactionEngine.attachBalances(tx.id, balanceBefore, balanceAfter);
+      committed.push(s.transferId);
+      await StorageEngine.set('committedTransfers', committed);
+      await NotificationEngine.createFromTransaction(tx);
+      set({ committed:true, transactionId: tx.id, status:'completed', currentStep:'success', completedAt: Date.now() });
+      return ReceiptEngine.generate(tx.id);
+    },
+    cancel(){
+      if (state.committed) throw { code:'TRANSFER_ALREADY_COMMITTED' };
+      set({ status:'cancelled', currentStep:'cancelled' });
+    },
+    reset(){ state = defaultState(); }
+  };
+})();
+
+/* -------- CardEngine -------- */
+const CardEngine = {
+  getAll(){ return StorageEngine.getSync('cards') || []; },
+  getById(id){ return CardEngine.getAll().find(c => c.id === id) || null; },
+  async createVirtual({ currency, holderName }){
+    if (!currency || !holderName) throw { code:'UNKNOWN_ERROR' };
+    const last4 = String(Math.floor(1000 + Math.random() * 9000));
+    const now = new Date();
+    const card = {
+      id: Ids.card(), type: 'virtual', brand: 'visa', holderName: holderName.trim(),
+      last4, maskedNumber: '•••• •••• •••• ' + last4,
+      expiryMonth: now.getMonth() + 1, expiryYear: now.getFullYear() + 3,
+      status: 'active', currency, balance: 0,
+      spendingLimits: { dailyLimit: 500, monthlyLimit: 5000, transactionLimit: 300, onlineLimit: 500, cashWithdrawalLimit: 0 },
+      createdAt: Date.now(), updatedAt: Date.now(), frozenAt: null, closedAt: null
+    };
+    const list = CardEngine.getAll().slice();
+    list.push(card);
+    await StorageEngine.set('cards', list);
+    return card;
+  },
+  async _update(id, patch){
+    const list = CardEngine.getAll().slice();
+    const i = list.findIndex(c => c.id === id);
+    if (i === -1) throw { code:'UNKNOWN_ERROR' };
+    list[i] = { ...list[i], ...patch, updatedAt: Date.now() };
+    await StorageEngine.set('cards', list);
+    return list[i];
+  },
+  async activate(id){ return CardEngine._update(id, { status:'active' }); },
+  async freeze(id){ return CardEngine._update(id, { status:'frozen', frozenAt: Date.now() }); },
+  async unfreeze(id){ return CardEngine._update(id, { status:'active', frozenAt: null }); },
+  async close(id){ return CardEngine._update(id, { status:'closed', closedAt: Date.now() }); }
+};
+
+/* -------- CryptoEngine -------- */
+const CRYPTO_ASSETS = [
+  { id:'btc',  symbol:'BTC',  name:'Bitcoin',  network:'Bitcoin',  decimals:8, tint:'#F7931A' },
+  { id:'eth',  symbol:'ETH',  name:'Ethereum', network:'Ethereum', decimals:8, tint:'#627EEA' },
+  { id:'usdt', symbol:'USDT', name:'Tether',   network:'Ethereum', decimals:6, tint:'#26A17B' },
+  { id:'usdc', symbol:'USDC', name:'USD Coin', network:'Ethereum', decimals:6, tint:'#2775CA' }
+];
+const CryptoEngine = {
+  getAssets(){ return CRYPTO_ASSETS.slice(); },
+  getAsset(id){ return CRYPTO_ASSETS.find(a => a.id === id) || null; },
+  getWallets(){ return StorageEngine.getSync('cryptoWallets') || []; },
+  getWalletByAsset(aid){ return CryptoEngine.getWallets().find(w => w.assetId === aid) || null; },
+  async createWallet(assetId){
+    const asset = CryptoEngine.getAsset(assetId);
+    if (!asset) throw { code:'CRYPTO_ASSET_NOT_FOUND' };
+    const existing = CryptoEngine.getWalletByAsset(assetId);
+    if (existing) return existing;
+    const w = {
+      id: Ids.wallet(), assetId: asset.id, symbol: asset.symbol, network: asset.network,
+      address: null, balance: 0, availableBalance: 0, lockedBalance: 0,
+      status: 'active', createdAt: Date.now()
+    };
+    const list = CryptoEngine.getWallets().slice();
+    list.push(w);
+    await StorageEngine.set('cryptoWallets', list);
+    return w;
+  }
+};
+
+/* -------- ServicesEngine (catalogue — providers externes non branchés) -------- */
+const SERVICES = [
+  { id:'bills_electricity', name:'Electricity', category:'bills', currency:'OMR' },
+  { id:'bills_water',       name:'Water',       category:'bills', currency:'OMR' },
+  { id:'topup_mobile',      name:'Mobile Top Up', category:'topup', currency:'OMR' },
+  { id:'internet_home',     name:'Home Internet', category:'internet', currency:'OMR' },
+  { id:'utilities_gas',     name:'Gas', category:'utilities', currency:'OMR' },
+  { id:'subs_streaming',    name:'Streaming', category:'subscriptions', currency:'USD' },
+  { id:'gov_fines',         name:'Traffic Fines', category:'government', currency:'OMR' },
+  { id:'other_donation',    name:'Donation', category:'other', currency:'OMR' }
+];
+const ServicesEngine = {
+  getCategories(){ return ['bills','topup','internet','utilities','subscriptions','government','other']; },
+  getServicesByCategory(cat){ return SERVICES.filter(s => s.category === cat); },
+  getServiceById(id){ return SERVICES.find(s => s.id === id) || null; }
+};
+
+/* -------- ProfileEngine -------- */
+const ProfileEngine = {
+  _default(){
+    const now = Date.now();
+    return {
+      id: 'usr_primary',
+      firstName: PRIMARY_ACCOUNT.firstName,
+      lastName: PRIMARY_ACCOUNT.lastName,
+      displayName: PRIMARY_ACCOUNT.holder,
+      email: '', phone: PRIMARY_ACCOUNT.phone, country: 'OM',
+      language: 'fr', currency: 'OMR',
+      avatar: null, kycStatus: 'not_started',
+      createdAt: now, updatedAt: now
+    };
+  },
+  get(){
+    let p = StorageEngine.getSync('profile');
+    if (!p){ p = ProfileEngine._default(); StorageEngine.set('profile', p); }
+    return p;
+  },
+  async update(patch){
+    const cur = ProfileEngine.get();
+    const clean = { ...patch };
+    delete clean.kycStatus; delete clean.id; delete clean.createdAt;
+    const next = { ...cur, ...clean, updatedAt: Date.now() };
+    await StorageEngine.set('profile', next);
+    EventBus.emit('profileChanged', next);
+    return next;
+  },
+  async _syncKyc(status){
+    const cur = ProfileEngine.get();
+    const next = { ...cur, kycStatus: status, updatedAt: Date.now() };
+    await StorageEngine.set('profile', next);
+    EventBus.emit('profileChanged', next);
+  }
+};
+
+/* -------- SecurityEngine -------- */
+const SecurityEngine = {
+  getSettings(){
+    const s = StorageEngine.getSync('security') || {};
+    return {
+      pinEnabled: !!s.pinHash,
+      biometricEnabled: !!s.biometric,
+      requireForTransfer: s.requireForTransfer !== false,
+      requireForPayment: s.requireForPayment !== false,
+      requireForCardActions: !!s.requireForCardActions,
+      requireForCryptoActions: s.requireForCryptoActions !== false
+    };
+  },
+  async _hash(pin){
+    const enc = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const keyMat = await crypto.subtle.importKey('raw', enc.encode(pin), { name:'PBKDF2' }, false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name:'PBKDF2', salt, iterations: 200000, hash:'SHA-256' }, keyMat, 256);
+    const b64 = (u8) => btoa(String.fromCharCode.apply(null, u8));
+    return { hash: b64(new Uint8Array(bits)), salt: b64(salt), iterations: 200000 };
+  },
+  async setPin(pin){
+    if (!/^\d{6}$/.test(pin)) throw { code:'INVALID_PIN' };
+    const h = await SecurityEngine._hash(pin);
+    const s = { ...(StorageEngine.getSync('security') || {}) };
+    s.pinHash = h.hash; s.pinSalt = h.salt; s.pinIterations = h.iterations;
+    await StorageEngine.set('security', s);
+  },
+  async verifyPin(pin){
+    const s = StorageEngine.getSync('security') || {};
+    if (!s.pinHash) return false;
+    const enc = new TextEncoder();
+    const salt = Uint8Array.from(atob(s.pinSalt), c => c.charCodeAt(0));
+    const keyMat = await crypto.subtle.importKey('raw', enc.encode(pin), { name:'PBKDF2' }, false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name:'PBKDF2', salt, iterations: s.pinIterations || 200000, hash:'SHA-256' }, keyMat, 256);
+    const b64 = btoa(String.fromCharCode.apply(null, new Uint8Array(bits)));
+    return b64 === s.pinHash;
+  }
+};
+
+/* -------- KycEngine -------- */
+const KycEngine = {
+  get(){ return StorageEngine.getSync('kyc') || null; },
+  getStatus(){ const a = KycEngine.get(); return a ? a.status : 'not_started'; },
+  async start(){
+    const existing = KycEngine.get();
+    if (existing && ['submitted','under_review','verified'].includes(existing.status)) return existing;
+    const profile = ProfileEngine.get();
+    const app = {
+      id: existing ? existing.id : Ids.kyc(), status: 'draft',
+      firstName: profile.firstName || '', lastName: profile.lastName || '',
+      dateOfBirth: null, nationality: null, address: null,
+      documentType: null, documentRef: null, documentStatus: 'pending',
+      submittedAt: null, reviewedAt: null, rejectionReason: null
+    };
+    await StorageEngine.set('kyc', app);
+    await ProfileEngine._syncKyc('draft');
+    return app;
+  },
+  async updateDraft(patch){
+    const cur = KycEngine.get();
+    if (!cur || cur.status !== 'draft') throw { code:'KYC_INVALID_DATA' };
+    const clean = { ...patch };
+    delete clean.id; delete clean.status;
+    const next = { ...cur, ...clean };
+    await StorageEngine.set('kyc', next);
+  },
+  async submit(){
+    const cur = KycEngine.get();
+    if (!cur || cur.status !== 'draft') throw { code:'KYC_INVALID_DATA' };
+    const next = { ...cur, status:'submitted', submittedAt: Date.now() };
+    await StorageEngine.set('kyc', next);
+    await ProfileEngine._syncKyc('submitted');
+  }
+};
+
+/* ==========================================================================
+   UTIL
+   ========================================================================== */
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function el(html){ const d = document.createElement('div'); d.innerHTML = html; return d.firstElementChild; }
+function toast(msg){
+  document.querySelectorAll('.ovy-toast').forEach(x => x.remove());
+  const n = el('<div class="ovy-toast" role="status">' + esc(msg) + '</div>');
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 2400);
+}
+function timeAgo(ts){
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 30) return t('time.now');
+  if (diff < 60) return diff + 's';
+  if (diff < 3600) return Math.floor(diff/60) + 'm';
+  const d = new Date(ts), t0 = new Date();
+  const y = new Date(Date.now() - 86400000);
+  if (d.toDateString() === t0.toDateString()) return d.toLocaleTimeString(locale(), { hour:'2-digit', minute:'2-digit' });
+  if (d.toDateString() === y.toDateString()) return t('history.yesterday');
+  return d.toLocaleDateString(locale());
+}
+function go(h){ if (location.hash === h) route(); else location.hash = h; }
+function initialsOf(p){
+  return ((p.firstName || '') + ' ' + (p.lastName || '')).trim().split(/\s+/).map(s => s[0]||'').join('').slice(0,2).toUpperCase() || 'OV';
+}
+function settingsGet(){ return StorageEngine.getSync('settings') || {}; }
+function statusText(s){ const k = 'status.' + s; const v = t(k); return v === k ? s : v; }
+function sectionTitle(txt, extra){ return '<div class="ovy-section"><div class="ovy-section__title">' + esc(txt) + '</div>' + (extra || '') + '</div>'; }
+function chevRow(){ return '<div class="ovy-list__right">' + svg('chev') + '</div>'; }
+function emptyBlock(icon, title){ return '<div class="ovy-empty">' + (icon ? svg(icon) : '') + '<div class="ovy-empty__title">' + esc(title) + '</div></div>'; }
+function askPin(){
+  return new Promise(resolve => {
+    const ov = el('<div class="ovy-overlay"><div class="ovy-dialog" role="dialog" aria-modal="true">' +
+      '<div class="ovy-dialog__title">' + esc(t('security.setPin')) + '</div>' +
+      '<input id="pin-input" class="ovy-input__field" type="password" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="' + esc(t('security.pinPrompt')) + '" />' +
+      '<div class="ovy-dialog__actions">' +
+        '<button class="ovy-btn ovy-btn--secondary ovy-btn--sm" data-x="cancel">' + esc(t('action.cancel')) + '</button>' +
+        '<button class="ovy-btn ovy-btn--primary ovy-btn--sm" data-x="ok">' + esc(t('action.save')) + '</button>' +
+      '</div></div></div>');
+    const input = ov.querySelector('#pin-input');
+    const close = v => { ov.remove(); resolve(v); };
+    ov.querySelector('[data-x="cancel"]').addEventListener('click', () => close(null));
+    ov.querySelector('[data-x="ok"]').addEventListener('click', () => close(input.value));
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') close(input.value); });
+    document.body.appendChild(ov);
+    input.focus();
+  });
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+function layout(inner, opts){
+  opts = opts || {};
+  const current = opts.active || '';
+  const showNav = opts.showNav !== false;
+  const showHeader = opts.showHeader !== false;
+  const title = opts.title || '';
+  const back = opts.back;
+  const right = opts.right || '';
+  let header = '';
+  if (showHeader){
+    header =
+      '<header class="ovy-header">' +
+        (back
+          ? '<button class="ovy-header__icon" data-nav="' + esc(back) + '" aria-label="' + esc(t('action.back')) + '">' + svg('back') + '</button>'
+          : '<span class="ovy-header__icon" aria-hidden="true"></span>') +
+        '<div class="ovy-header__title">' + esc(title) + '</div>' +
+        (right || '<span class="ovy-header__icon" aria-hidden="true"></span>') +
+      '</header>';
+  }
+  const bottom = showNav
+    ? '<nav class="ovy-bottomnav" role="navigation">' +
+        navItem('home',     t('nav.home'),     '#/',          current) +
+        navItem('accounts', t('nav.accounts'), '#/accounts',  current) +
+        navItem('transfer', t('nav.transfer'), '#/transfer',  current) +
+        navItem('crypto',   t('nav.crypto'),   '#/crypto',    current) +
+        navItem('more',     t('nav.more'),     '#/more',      current) +
+      '</nav>'
+    : '';
+  const cls = 'ovy-screen' + (showNav ? '' : ' ovy-screen--nonav');
+  return '<div class="' + cls + '">' + header + '<div class="ovy-content' + (opts.top ? ' ovy-content--top' : '') + '">' + inner + '</div>' + bottom + '</div>';
+}
+function navItem(icon, label, href, current){
+  const on = current === href;
+  return '<a class="ovy-nav-item" href="' + href + '"' + (on ? ' aria-current="page"' : '') + '>' + svg(icon, 22) + '<span>' + esc(label) + '</span></a>';
+}
+function row(k, v, strong){
+  return '<div class="ovy-row ovy-row--between" style="padding:6px 0">' +
+    '<span style="color:var(--text-2);font:var(--f-small)">' + esc(k) + '</span>' +
+    '<span class="ovy-num" style="font:' + (strong ? 'var(--f-amt-m)' : 'var(--f-amt-s)') + '">' + esc(v) + '</span>' +
+  '</div>';
+}
+function kv(icon, k, v){
+  return '<div class="ovy-kv"><div class="ovy-tile" style="width:38px;height:38px;border-radius:11px">' + svg(icon, 18) + '</div>' +
+    '<div class="ovy-grow"><div class="ovy-kv__k">' + esc(k) + '</div><div class="ovy-kv__v">' + esc(v) + '</div></div></div>';
+}
+function currencyTile(cur){
+  return '<div class="ovy-tile" style="--tint:' + (CURRENCY_TINT[cur] || '#FF7A00') + '">' + svg('accounts', 21) + '</div>';
+}
+function cardVisual(c){
+  const cls = 'ovy-card-visual' + (c.status === 'frozen' ? ' ovy-card-visual--frozen' : '') + (c.type === 'virtual' ? ' ovy-card-visual--white' : '');
+  return '<div class="' + cls + '">' +
+    '<div class="ovy-card-visual__top"><span class="ovy-card-visual__brand">OVY</span><span class="ovy-visa">VISA</span></div>' +
+    '<div class="ovy-card-visual__num ovy-num">' + esc(c.maskedNumber) + '</div>' +
+    '<div class="ovy-card-visual__row"><span>' + esc(c.holderName) + '</span><span class="ovy-num">' + String(c.expiryMonth).padStart(2,'0') + '/' + String(c.expiryYear).slice(-2) + '</span></div>' +
+  '</div>';
+}
+
+/* ==========================================================================
+   SCREEN STATE (uniquement de l'UI)
+   ========================================================================== */
+let historyFilter = 'all';
+let notifFilter = 'all';
+let pendingBen = null; // { phone, returnTo }
+
+/* ==========================================================================
+   SCREENS
+   ========================================================================== */
+
+/* -------- Login -------- */
+function screenLogin(){
+  return '<div class="ovy-screen ovy-screen--login">' +
+    '<div class="ovy-login">' +
+      '<div class="ovy-login__brand">' + lockup(52) + '</div>' +
+      '<div class="ovy-login__title">' + esc(t('login.welcome')) + '</div>' +
+      '<div class="ovy-login__sub">' + esc(t('login.subtitle')) + '</div>' +
+      '<div class="ovy-login__form">' +
+        '<div class="ovy-input">' +
+          '<label class="ovy-input__label" for="login-phone">' + esc(t('login.phone')) + '</label>' +
+          '<div class="ovy-input__wrap">' + svg('phone', 20) + '<input id="login-phone" class="ovy-input__field" inputmode="tel" autocomplete="tel" /></div>' +
+        '</div>' +
+        '<div class="ovy-input">' +
+          '<label class="ovy-input__label" for="login-password">' + esc(t('login.password')) + '</label>' +
+          '<div class="ovy-input__wrap">' + svg('lock', 20) + '<input id="login-password" class="ovy-input__field" type="password" autocomplete="current-password" />' +
+          '<button type="button" id="login-eye" class="ovy-input__eye" aria-label="' + esc(t('login.show')) + '">' + svg('eye', 20) + '</button></div>' +
+        '</div>' +
+        '<div id="login-err" class="ovy-input__error" role="alert" style="min-height:18px"></div>' +
+        '<button id="login-btn" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('login.submit')) + '</button>' +
+        '<button type="button" class="ovy-login__link" data-unavailable>' + esc(t('login.forgot')) + '</button>' +
+        '<div class="ovy-login__or">' + esc(t('login.orWith')) + '</div>' +
+        '<div class="ovy-login__social">' +
+          '<button type="button" class="ovy-btn ovy-btn--outline" data-unavailable>Google</button>' +
+          '<button type="button" class="ovy-btn ovy-btn--outline" data-unavailable>Apple</button>' +
+        '</div>' +
+        '<div class="ovy-login__foot">' + esc(t('login.noAccount')) + ' <button type="button" data-unavailable style="color:var(--ovy-orange);font-weight:600">' + esc(t('login.signup')) + '</button></div>' +
+      '</div>' +
+    '</div>' +
+    '<svg class="ovy-login-wave" viewBox="0 0 400 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 116C90 66 160 140 240 100S350 44 400 74V150H0Z" fill="#FF7A00" fill-opacity=".22"/><path d="M0 132C96 100 170 150 260 122S360 98 400 110V150H0Z" fill="#FF7A00" fill-opacity=".85"/></svg>' +
+  '</div>';
+}
+
+/* -------- Dashboard -------- */
+function screenDashboard(){
+  const accounts = AccountEngine.getAll();
+  const txs = TransactionEngine.getAll().slice(0, 5);
+  const profile = ProfileEngine.get();
+  const hide = !!settingsGet().hideBalance;
+  const fmt = (a, v) => hide ? '••••••' : Money.format(v, a.currency);
+  const main = accounts[0];
+  const unread = NotificationEngine.countUnread();
+
+  const top =
+    '<div class="ovy-topbar">' +
+      '<div class="ovy-avatar">' + esc(initialsOf(profile)) + '</div>' +
+      '<div class="ovy-grow"><div class="ovy-topbar__hello">' + esc(t('home.greeting')) + '</div><div class="ovy-topbar__name">' + esc(profile.displayName || 'OVY Wallet') + '</div></div>' +
+      '<a class="ovy-bell" href="#/notifications" aria-label="' + esc(t('notifications.title')) + '">' + svg('notif', 20) + (unread > 0 ? '<span class="ovy-bell__n">' + unread + '</span>' : '') + '</a>' +
+    '</div>';
+
+  const hero = main
+    ? '<div class="ovy-hero">' +
+        '<div class="ovy-hero__top"><span>' + esc(t('home.mainAccount')) + '</span>' +
+          '<button class="ovy-hero__eye" data-toggle-balance aria-label="' + esc(t('home.hideBalance')) + '">' + svg(hide ? 'eyeoff' : 'eye', 18) + '</button></div>' +
+        '<div class="ovy-hero__amt ovy-num">' + esc(fmt(main, main.balance)) + '</div>' +
+        '<div class="ovy-hero__sub ovy-num">' + esc(t('accounts.available')) + ' · ' + esc(fmt(main, main.availableBalance)) + '</div>' +
+      '</div>'
+    : '';
+
+  const quickDefs = [
+    { icon:'send',     label:t('nav.transfer'),   href:'#/transfer', solid:true },
+    { icon:'cards',    label:t('nav.cards'),      href:'#/cards' },
+    { icon:'services', label:t('services.title'), href:'#/services' },
+    { icon:'history',  label:t('history.title'),  href:'#/history' }
+  ];
+  const quick = '<div class="ovy-quick">' + quickDefs.map(q =>
+    '<a class="ovy-quick__item" href="' + q.href + '"><span class="ovy-tile' + (q.solid ? ' ovy-tile--solid' : '') + '">' + svg(q.icon, 24) + '</span><span>' + esc(q.label) + '</span></a>'
+  ).join('') + '</div>';
+
+  const accs = accounts.length
+    ? '<div class="ovy-list">' + accounts.map(a =>
+        '<a class="ovy-list__row" href="#/account/' + a.id + '">' + currencyTile(a.currency) +
+          '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(accLabel(a)) + '</div><div class="ovy-list__sub">' + esc(a.currency) + '</div></div>' +
+          '<div class="ovy-list__right"><div class="ovy-list__amount ovy-num">' + esc(fmt(a, a.balance)) + '</div></div>' +
+        '</a>').join('') + '</div>'
+    : emptyBlock(null, '—');
+
+  const txList = txs.length ? txs.map(txRowHtml).join('') : emptyBlock(null, t('home.noTx'));
+
+  return layout(
+    top + hero + quick +
+    sectionTitle(t('home.myAccounts'), '<a href="#/accounts" style="font:var(--f-small)">' + esc(t('action.viewAll')) + '</a>') + accs +
+    sectionTitle(t('home.recent'), '<a href="#/history" style="font:var(--f-small)">' + esc(t('action.viewAll')) + '</a>') +
+    '<div class="ovy-list">' + txList + '</div>',
+    { showHeader:false, active:'#/', top:true }
+  );
+}
+
+function txRowHtml(tx){
+  const name = tx.beneficiaryMaskedName || tx.counterparty || tx.label;
+  const phone = tx.beneficiaryPhone || '';
+  const credit = tx.direction === 'credit';
+  const sign = credit ? '+' : '-';
+  return '<a class="ovy-tx-row" href="#/transaction/' + tx.id + '">' +
+    '<div class="ovy-tile">' + svg(credit ? 'receive' : 'send', 20) + '</div>' +
+    '<div class="ovy-tx-row__body">' +
+      '<div class="ovy-tx-row__name">' + esc(name) + '</div>' +
+      (phone ? '<div class="ovy-tx-row__phone ovy-num">' + esc(phone) + '</div>' : '') +
+    '</div>' +
+    '<div class="ovy-tx-row__right">' +
+      '<div class="ovy-tx-row__amt' + (credit ? ' ovy-tx-row__amt--c' : '') + '">' + esc(sign + Money.format(tx.amount, tx.currency)) + '</div>' +
+      '<div class="ovy-tx-row__status">' + esc(statusText(tx.status)) + ' · ' + esc(timeAgo(tx.date)) + '</div>' +
+    '</div>' +
+  '</a>';
+}
+
+/* -------- Accounts -------- */
+function screenAccounts(){
+  const accounts = AccountEngine.getAll();
+  if (!accounts.length) return layout(emptyBlock('accounts', '—'), { title:t('accounts.title'), active:'#/accounts', back:'#/' });
+  const main = accounts[0];
+  const hero =
+    '<div class="ovy-hero">' +
+      '<div class="ovy-hero__top"><span>' + esc(t('home.mainAccount')) + '</span><span>' + esc(main.currency) + '</span></div>' +
+      '<div class="ovy-hero__amt ovy-num">' + esc(Money.format(main.balance, main.currency)) + '</div>' +
+      '<div class="ovy-hero__sub ovy-num">' + esc(t('accounts.available')) + ' · ' + esc(Money.format(main.availableBalance, main.currency)) + '</div>' +
+    '</div>';
+  const list = '<div class="ovy-list">' + accounts.map(a =>
+    '<a class="ovy-list__row" href="#/account/' + a.id + '">' + currencyTile(a.currency) +
+      '<div class="ovy-list__body">' +
+        '<div class="ovy-list__title">' + esc(accLabel(a)) + '</div>' +
+        '<div class="ovy-list__sub ovy-num">' + esc(t('accounts.available')) + ' · ' + esc(Money.format(a.availableBalance, a.currency)) + '</div>' +
+      '</div>' +
+      '<div class="ovy-list__right"><div class="ovy-list__amount ovy-num">' + esc(Money.format(a.balance, a.currency)) + '</div></div>' +
+    '</a>').join('') + '</div>';
+  return layout(hero + list, { title:t('accounts.title'), active:'#/accounts', back:'#/' });
+}
+
+function screenAccountDetail(params){
+  const acc = AccountEngine.getById(params.id);
+  if (!acc) return layout(emptyBlock(null, '—'), { title:'—', back:'#/accounts' });
+  const txs = TransactionEngine.getByAccount(acc.id).slice(0, 20);
+  const list = txs.length ? txs.map(txRowHtml).join('') : emptyBlock(null, t('home.noTx'));
+  return layout(
+    '<div class="ovy-card ovy-card--accent">' +
+      '<div style="font:var(--f-small);opacity:.9">' + esc(accLabel(acc)) + '</div>' +
+      '<div class="ovy-num" style="font:var(--f-amt-l);margin-top:8px">' + esc(Money.format(acc.balance, acc.currency)) + '</div>' +
+      '<div class="ovy-num" style="font:var(--f-small);opacity:.9;margin-top:4px">' + esc(t('accounts.available')) + ' · ' + esc(Money.format(acc.availableBalance, acc.currency)) + '</div>' +
+    '</div>' +
+    sectionTitle(t('home.recent')) +
+    '<div class="ovy-list">' + list + '</div>',
+    { title:t('accounts.detail'), active:'#/accounts', back:'#/accounts' }
+  );
+}
+
+/* -------- Transfer flow -------- */
+const TRANSFER_BACK = {
+  home:'#/', type:'#/transfer', method:'#/transfer/type', beneficiary:'#/transfer/method',
+  source_account:'#/transfer/beneficiary', amount:'#/transfer/source_account', fees:'#/transfer/amount',
+  confirmation:'#/transfer/fees', otp:'#/transfer/confirmation'
+};
+function transferGuard(step){
+  const s = TransferEngine.getState();
+  if (!step || step === 'home') return null;
+  if (!s.transferId) return '#/transfer';
+  if (s.committed) return step === 'success' ? null : '#/transfer/success';
+  const need = {
+    type: true,
+    method: !!s.type,
+    beneficiary: !!s.type && !!s.method,
+    source_account: !!s.beneficiaryId,
+    amount: !!s.sourceAccountId,
+    fees: s.amount > 0,
+    confirmation: s.total > 0,
+    otp: s.status === 'pending' && s.currentStep === 'otp',
+    processing: !!s.otpVerified,
+    success: false
+  };
+  if (!(step in need)) return '#/transfer';
+  return need[step] ? null : '#/transfer';
+}
+function screenTransferHome(){
+  let s = TransferEngine.getState();
+  if (!s.transferId || s.committed || s.status === 'cancelled'){ TransferEngine.start(); s = TransferEngine.getState(); }
+  const steps = [
+    { step:'type',           label:t('transfer.type') },
+    { step:'method',         label:t('transfer.method') },
+    { step:'beneficiary',    label:t('transfer.beneficiary') },
+    { step:'source_account', label:t('transfer.sourceAccount') },
+    { step:'amount',         label:t('transfer.amount') },
+    { step:'fees',           label:t('transfer.fees') },
+    { step:'confirmation',   label:t('transfer.review') },
+    { step:'otp',            label:t('transfer.otp') }
+  ];
+  const order = steps.map(x => x.step);
+  const curIdx = order.indexOf(s.currentStep);
+  const body = steps.map((st, i) => {
+    const ok = transferGuard(st.step) === null;
+    const done = curIdx > i;
+    const icon = done ? svg('check', 18, 3) : svg('chev', 18);
+    const badge = s.currentStep === st.step ? '<span class="ovy-badge ovy-badge--accent">' + esc(st.label) + '</span>' : '';
+    const inner =
+      '<div class="ovy-tile" style="width:36px;height:36px;border-radius:11px">' + icon + '</div>' +
+      '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(st.label) + '</div></div>' +
+      '<div class="ovy-list__right">' + badge + '</div>';
+    return ok
+      ? '<a class="ovy-list__row" href="#/transfer/' + st.step + '">' + inner + '</a>'
+      : '<div class="ovy-list__row ovy-list__row--disabled">' + inner + '</div>';
+  }).join('');
+  const target = order.includes(s.currentStep) && transferGuard(s.currentStep) === null ? s.currentStep : 'type';
+  const tiles =
+    '<div class="ovy-quick" style="grid-template-columns:repeat(2,1fr)">' +
+      [['local','send','transfer.type.local'],['international','globe','transfer.type.international']].map(x =>
+        '<button class="ovy-more__item" data-tt="' + x[0] + '"><span class="ovy-tile' + (s.type === x[0] ? ' ovy-tile--solid' : '') + '">' + svg(x[1], 22) + '</span>' + esc(t(x[2])) + '</button>').join('') +
+    '</div>';
+  return layout(
+    tiles +
+    '<div class="ovy-card"><div class="ovy-label">' + esc(t('tx.reference')) + '</div><div class="ovy-num" style="font:var(--f-amt-m);margin-top:4px">' + esc(s.reference || '—') + '</div></div>' +
+    '<div class="ovy-list">' + body + '</div>' +
+    '<a class="ovy-btn ovy-btn--primary ovy-btn--block" href="#/transfer/' + target + '">' + esc(target === 'type' ? t('action.continue') : t('transfer.resume')) + '</a>',
+    { title:t('transfer.title'), active:'#/transfer', back:TRANSFER_BACK.home }
+  );
+}
+function screenTransferType(){
+  const s = TransferEngine.getState();
+  const opt = (k, icon, label) =>
+    '<button class="ovy-list__row" data-tt="' + k + '">' +
+      '<div class="ovy-tile' + (s.type === k ? ' ovy-tile--solid' : '') + '">' + svg(icon, 20) + '</div>' +
+      '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(label) + '</div></div>' + chevRow() +
+    '</button>';
+  return layout('<div class="ovy-list">' + opt('local','send',t('transfer.type.local')) + opt('international','globe',t('transfer.type.international')) + '</div>',
+    { title:t('transfer.type'), active:'#/transfer', back:TRANSFER_BACK.type });
+}
+function screenTransferMethod(){
+  const s = TransferEngine.getState();
+  const icons = { mobile:'phone', account:'accounts', card:'cards', bank:'bank', wallet:'crypto' };
+  let keys = TransferEngine.getMethods(s.type);
+  if (s.type === 'local' && !CardEngine.getAll().some(c => c.status === 'active')) keys = keys.filter(k => k !== 'card'); // carte : seulement si disponible
+  const body = keys.map(k =>
+    '<button class="ovy-list__row" data-tm="' + k + '">' +
+      '<div class="ovy-tile' + (s.method === k ? ' ovy-tile--solid' : '') + '">' + svg(icons[k] || 'transfer', 20) + '</div>' +
+      '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(t('transfer.method.' + k)) + '</div></div>' + chevRow() +
+    '</button>').join('');
+  return layout('<div class="ovy-list">' + body + '</div>', { title:t('transfer.method'), active:'#/transfer', back:TRANSFER_BACK.method });
+}
+function screenTransferBeneficiary(){
+  const bens = BeneficiaryEngine.getAll();
+  const items = bens.length
+    ? '<div class="ovy-list">' + bens.map(b =>
+        '<button class="ovy-list__row" data-tb="' + b.id + '">' +
+          '<div class="ovy-tile">' + svg('user', 20) + '</div>' +
+          '<div class="ovy-list__body">' +
+            '<div class="ovy-list__title ovy-num">' + esc(b.phoneRaw || b.phone) + '</div>' +
+            '<div class="ovy-list__sub">' + esc(b.maskedName) + '</div>' +
+          '</div>' + chevRow() +
+        '</button>').join('') + '</div>'
+    : '<div class="ovy-empty">' + svg('user') + '<div class="ovy-empty__title">' + esc(t('beneficiaries.empty')) + '</div><a class="ovy-btn ovy-btn--primary" href="#/beneficiaries/new">' + esc(t('beneficiaries.add')) + '</a></div>';
+  return layout(
+    '<div class="ovy-input"><label class="ovy-input__label" for="t-phone">' + esc(t('transfer.phone')) + '</label>' +
+      '<div class="ovy-input__wrap">' + svg('phone', 20) + '<input id="t-phone" class="ovy-input__field ovy-num" inputmode="tel" autocomplete="off" placeholder="' + esc(t('transfer.enterNumber')) + '" /></div>' +
+    '</div>' +
+    '<div id="t-recog" class="ovy-recog is-empty" aria-live="polite"></div>' +
+    '<button id="t-ben-next" class="ovy-btn ovy-btn--primary ovy-btn--block" disabled>' + esc(t('action.continue')) + '</button>' +
+    sectionTitle(t('beneficiaries.title')) + items,
+    { title:t('transfer.beneficiary'), active:'#/transfer', back:TRANSFER_BACK.beneficiary }
+  );
+}
+function screenTransferSource(){
+  const accounts = AccountEngine.getAll();
+  const s = TransferEngine.getState();
+  const rows = accounts.map(a =>
+    '<button class="ovy-list__row" data-tsa="' + a.id + '">' + currencyTile(a.currency) +
+      '<div class="ovy-list__body">' +
+        '<div class="ovy-list__title">' + esc(accLabel(a)) + '</div>' +
+        '<div class="ovy-list__sub ovy-num">' + esc(Money.format(a.availableBalance, a.currency)) + '</div>' +
+      '</div>' + (s.sourceAccountId === a.id ? '<div class="ovy-list__right" style="color:var(--ovy-orange)">' + svg('check', 20, 3) + '</div>' : chevRow()) +
+    '</button>').join('');
+  return layout('<div class="ovy-list">' + rows + '</div>', { title:t('transfer.sourceAccount'), active:'#/transfer', back:TRANSFER_BACK.source_account });
+}
+function screenTransferAmount(){
+  const s = TransferEngine.getState();
+  const acc = s.sourceAccountId ? AccountEngine.getById(s.sourceAccountId) : null;
+  return layout(
+    '<div class="ovy-card ovy-row">' + (acc ? currencyTile(acc.currency) : '') +
+      '<div class="ovy-grow"><div class="ovy-label">' + esc(t('transfer.sourceAccount')) + '</div>' +
+      '<div style="font:var(--f-btn);margin-top:2px">' + esc(accLabel(acc)) + '</div>' +
+      '<div class="ovy-num" style="font:var(--f-small);color:var(--text-2)">' + esc(acc ? Money.format(acc.availableBalance, acc.currency) : '—') + '</div></div>' +
+    '</div>' +
+    '<div class="ovy-input"><label class="ovy-input__label" for="t-amount">' + esc(t('transfer.amount')) + '</label>' +
+      '<div class="ovy-amount"><input id="t-amount" inputmode="decimal" placeholder="0.00" autocomplete="off" value="' + (s.amount > 0 ? esc(s.amount) : '') + '" /><span class="ovy-amount__cur">' + esc(s.sourceCurrency || '') + '</span></div>' +
+      '<div id="t-amount-err" class="ovy-input__error" role="alert"></div>' +
+    '</div>' +
+    '<div class="ovy-row ovy-row--between"><span style="color:var(--text-2);font:var(--f-small)">' + esc(t('transfer.feeEstimate')) + '</span><span id="t-fee-preview" class="ovy-num" style="font:var(--f-amt-s)">' + esc(Money.format(0, s.sourceCurrency || 'OMR')) + '</span></div>' +
+    '<button id="t-amount-next" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('action.continue')) + '</button>',
+    { title:t('transfer.amount'), active:'#/transfer', back:TRANSFER_BACK.amount }
+  );
+}
+function screenTransferFees(){
+  const s0 = TransferEngine.getState();
+  if (!s0.total) { try { TransferEngine.calculateFees(); } catch {} }
+  const s = TransferEngine.getState();
+  return layout(
+    '<div class="ovy-card">' +
+      row(t('transfer.amount'), Money.format(s.amount, s.sourceCurrency)) +
+      row(t('transfer.fees'), Money.format(s.fee, s.sourceCurrency)) +
+      '<div class="ovy-divider"></div>' +
+      row(t('transfer.total'), Money.format(s.total, s.sourceCurrency), true) +
+    '</div>' +
+    '<button id="t-fees-next" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('action.continue')) + '</button>',
+    { title:t('transfer.fees'), active:'#/transfer', back:TRANSFER_BACK.fees }
+  );
+}
+function screenTransferConfirmation(){
+  const s = TransferEngine.getState();
+  const acc = AccountEngine.getById(s.sourceAccountId);
+  return layout(
+    '<div class="ovy-card">' +
+      '<div class="ovy-label">' + esc(t('tx.recipient')) + '</div>' +
+      '<div class="ovy-num" style="font:var(--f-amt-m);margin-top:6px">' + esc(s.beneficiaryPhone || '—') + '</div>' +
+      '<div style="font:var(--f-small);color:var(--text-2);margin-top:2px;word-break:break-all">' + esc(s.beneficiaryMaskedName || '—') + '</div>' +
+    '</div>' +
+    '<div class="ovy-card">' +
+      row(t('tx.from'), accLabel(acc)) +
+      row(t('tx.amount'), Money.format(s.amount, s.sourceCurrency)) +
+      row(t('tx.fee'), Money.format(s.fee, s.sourceCurrency)) +
+      '<div class="ovy-divider"></div>' +
+      row(t('tx.total'), Money.format(s.total, s.sourceCurrency), true) +
+      row(t('tx.reference'), s.reference || '—') +
+    '</div>' +
+    '<button id="t-confirm" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('action.confirm')) + '</button>',
+    { title:t('transfer.review'), active:'#/transfer', back:TRANSFER_BACK.confirmation }
+  );
+}
+function screenTransferOtp(){
+  const keys = [1,2,3,4,5,6,7,8,9].map(n => '<button data-key="' + n + '">' + n + '</button>').join('') +
+    '<span class="ovy-keypad__gap"></span><button data-key="0">0</button>' +
+    '<button data-key="del" aria-label="Delete">' + svg('backspace', 24) + '</button>';
+  return layout(
+    '<div style="text-align:center">' +
+      '<div style="font:var(--f-h2)">' + esc(t('transfer.otp')) + '</div>' +
+      '<div style="font:var(--f-small);color:var(--text-2);margin-top:4px">' + esc(t('transfer.otpHint')) + '</div>' +
+      '<div id="otp-dots" class="ovy-otp-dots">' + Array.from({length:6}).map(() => '<i></i>').join('') + '</div>' +
+      '<div id="otp-err" role="alert" style="color:var(--error);font:var(--f-small);min-height:18px"></div>' +
+    '</div>' +
+    '<div class="ovy-keypad">' + keys + '</div>',
+    { title:t('transfer.otp'), showNav:false, back:TRANSFER_BACK.otp }
+  );
+}
+function screenTransferProcessing(){
+  return layout(
+    '<div class="ovy-proc">' +
+      '<div class="ovy-proc__ring"><div class="ovy-proc__arc"></div><div class="ovy-proc__icon">' + svg('send', 58, 1.8) + '</div></div>' +
+      '<div class="ovy-proc__title">' + esc(t('transfer.processingTitle')) + '</div>' +
+      '<div class="ovy-proc__sub">' + esc(t('transfer.processingSub')) + '</div>' +
+    '</div>',
+    { showHeader:false, showNav:false, top:true }
+  );
+}
+function screenTransferSuccess(){
+  const s = TransferEngine.getState();
+  let receipt = null;
+  try { receipt = s.transactionId ? ReceiptEngine.generate(s.transactionId) : null; } catch {}
+  if (!receipt) return layout(emptyBlock(null, '—'), { title:t('transfer.success'), showNav:false, back:'#/' });
+  return layout(
+    '<div class="ovy-success">' +
+      '<div class="ovy-success__ring">' + svg('check', 44, 3) + '</div>' +
+      '<div style="font:var(--f-h2)">' + esc(t('transfer.success')) + '</div>' +
+      '<div class="ovy-success__amt ovy-num">' + esc(receipt.amountFormatted) + '</div>' +
+      '<div style="font:var(--f-small);color:var(--text-2)">' + esc(t('transfer.sentOk')) + '</div>' +
+    '</div>' +
+    '<div class="ovy-card">' +
+      kv('user', t('tx.recipient'), receipt.recipientPhone + ' · ' + receipt.recipientMaskedName) +
+      kv('doc', t('tx.reference'), receipt.reference) +
+      kv('history', t('tx.date'), receipt.dateHuman) +
+      '<div class="ovy-divider"></div>' +
+      row(t('tx.fee'), receipt.feeFormatted) +
+      row(t('tx.total'), receipt.totalFormatted, true) +
+    '</div>' +
+    '<a class="ovy-btn ovy-btn--primary ovy-btn--block" href="#/receipt/' + receipt.transactionId + '">' + esc(t('transfer.receipt')) + '</a>' +
+    '<a class="ovy-btn ovy-btn--outline ovy-btn--block" href="#/">' + esc(t('action.backHome')) + '</a>',
+    { showHeader:false, showNav:false, top:true }
+  );
+}
+
+/* -------- Beneficiaries -------- */
+function screenBeneficiaries(){
+  const bens = BeneficiaryEngine.getAll();
+  const rows = bens.length
+    ? '<div class="ovy-list">' + bens.map(b =>
+        '<div class="ovy-list__row">' +
+          '<div class="ovy-tile">' + svg('user', 20) + '</div>' +
+          '<div class="ovy-list__body">' +
+            '<div class="ovy-list__title ovy-num">' + esc(b.phoneRaw || b.phone) + '</div>' +
+            '<div class="ovy-list__sub">' + esc(b.maskedName) + '</div>' +
+          '</div>' +
+        '</div>').join('') + '</div>'
+    : '<div class="ovy-empty">' + svg('user') + '<div class="ovy-empty__title">' + esc(t('beneficiaries.empty')) + '</div></div>';
+  const right = '<a class="ovy-header__icon" href="#/beneficiaries/new" aria-label="' + esc(t('beneficiaries.add')) + '">' + svg('plus') + '</a>';
+  return layout(rows + '<a class="ovy-btn ovy-btn--primary ovy-btn--block" href="#/beneficiaries/new">' + esc(t('beneficiaries.add')) + '</a>',
+    { title:t('beneficiaries.title'), active:'#/more', back:'#/more', right });
+}
+function screenBeneficiaryNew(){
+  const pre = pendingBen ? pendingBen.phone : '';
+  const field = (id, key, extra) => '<div class="ovy-input"><label class="ovy-input__label" for="' + id + '">' + esc(t(key)) + (extra || '') + '</label><input id="' + id + '" class="ovy-input__field" autocomplete="off"' + (id === 'b-phone' ? ' inputmode="tel" value="' + esc(pre) + '"' : '') + ' /></div>';
+  return layout(
+    field('b-name','beneficiaries.name',' *') + field('b-phone','beneficiaries.phone',' *') +
+    field('b-account','beneficiaries.account') + field('b-iban','beneficiaries.iban') +
+    field('b-bank','beneficiaries.bank') + field('b-country','beneficiaries.country') +
+    '<div class="ovy-input"><label class="ovy-input__label" for="b-currency">' + esc(t('beneficiaries.currency')) + '</label>' +
+      '<select id="b-currency" class="ovy-input__field"><option>OMR</option><option>USD</option><option>EUR</option></select></div>' +
+    '<div id="b-err" class="ovy-input__error" role="alert"></div>' +
+    '<button id="b-save" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('action.save')) + '</button>',
+    { title:t('beneficiaries.add'), active:'#/more', back: pendingBen ? pendingBen.returnTo : '#/beneficiaries' }
+  );
+}
+
+/* -------- Cards -------- */
+function screenCards(){
+  const cards = CardEngine.getAll();
+  const rows = cards.length
+    ? cards.map(c => '<a class="ovy-cardlink" href="#/card/' + c.id + '" aria-label="' + esc(c.maskedNumber) + '">' + cardVisual(c) + '</a>').join('')
+    : '<div class="ovy-empty">' + svg('cards') + '<div class="ovy-empty__title">' + esc(t('cards.empty')) + '</div></div>';
+  const right = '<a class="ovy-header__icon" href="#/cards/new" aria-label="' + esc(t('cards.createVirtual')) + '">' + svg('plus') + '</a>';
+  return layout(rows + '<a class="ovy-btn ovy-btn--primary ovy-btn--block" href="#/cards/new">' + esc(t('cards.createVirtual')) + '</a>',
+    { title:t('cards.title'), active:'#/more', back:'#/more', right });
+}
+function screenCardDetail(params){
+  const c = CardEngine.getById(params.id);
+  if (!c) return layout(emptyBlock(null, '—'), { title:'—', back:'#/cards' });
+  const actions =
+    (c.status === 'inactive' ? '<button class="ovy-btn ovy-btn--primary ovy-btn--block" data-card-action="activate">' + esc(t('cards.activate')) + '</button>' : '') +
+    (c.status === 'frozen'   ? '<button class="ovy-btn ovy-btn--primary ovy-btn--block" data-card-action="unfreeze">' + esc(t('cards.unfreeze')) + '</button>' : '') +
+    (c.status === 'active'   ? '<button class="ovy-btn ovy-btn--secondary ovy-btn--block" data-card-action="freeze">' + esc(t('cards.freeze')) + '</button>' : '') +
+    (c.status !== 'closed'   ? '<button class="ovy-btn ovy-btn--outline ovy-btn--block" data-card-action="close">' + esc(t('cards.close')) + '</button>' : '');
+  return layout(
+    '<div class="ovy-cardlink">' + cardVisual(c) + '</div>' +
+    '<div class="ovy-card">' +
+      row(t('beneficiaries.currency'), c.currency) +
+      row(t('tx.status'), t('cards.status.' + c.status)) +
+    '</div>' +
+    '<div class="ovy-col" style="gap:8px" data-card-id="' + c.id + '">' + actions + '</div>',
+    { title:t('cards.detail'), active:'#/more', back:'#/cards' }
+  );
+}
+function screenCreateVirtualCard(){
+  const p = ProfileEngine.get();
+  return layout(
+    '<div class="ovy-input"><label class="ovy-input__label" for="cv-holder">' + esc(t('cards.holder')) + '</label><input id="cv-holder" class="ovy-input__field" autocomplete="off" value="' + esc(p.displayName || '') + '" /></div>' +
+    '<div class="ovy-input"><label class="ovy-input__label" for="cv-currency">' + esc(t('beneficiaries.currency')) + '</label><select id="cv-currency" class="ovy-input__field"><option>OMR</option><option>USD</option><option>EUR</option></select></div>' +
+    '<button id="cv-create" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('cards.createVirtual')) + '</button>',
+    { title:t('cards.createVirtual'), active:'#/more', back:'#/cards' }
+  );
+}
+
+/* -------- Crypto -------- */
+function screenCrypto(){
+  const rows = CryptoEngine.getAssets().map(a => {
+    const w = CryptoEngine.getWalletByAsset(a.id);
+    const right = w
+      ? '<div class="ovy-list__right"><div class="ovy-list__amount ovy-num">' + esc(Number(w.balance).toFixed(a.decimals)) + '</div><div class="ovy-list__sub" style="margin:0">' + esc(a.symbol) + '</div></div>'
+      : '<div class="ovy-list__right"><button class="ovy-btn ovy-btn--secondary ovy-btn--sm" data-crypto-create="' + a.id + '">' + esc(t('crypto.createWallet')) + '</button></div>';
+    return '<div class="ovy-list__row" style="cursor:default">' +
+      '<div class="ovy-tile" style="--tint:' + a.tint + '">' + esc(a.symbol.slice(0,4)) + '</div>' +
+      '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(a.name) + '</div><div class="ovy-list__sub">' + esc(w ? a.network : t('crypto.noWallet')) + '</div></div>' + right +
+    '</div>';
+  }).join('');
+  return layout(sectionTitle(t('crypto.assets')) + '<div class="ovy-list">' + rows + '</div>', { title:t('crypto.title'), active:'#/crypto', back:'#/' });
+}
+
+/* -------- More -------- */
+function screenMore(){
+  const unread = NotificationEngine.countUnread();
+  const items = [
+    { icon:'cards',    label:t('cards.title'),         href:'#/cards' },
+    { icon:'services', label:t('services.title'),      href:'#/services' },
+    { icon:'history',  label:t('history.title'),       href:'#/history' },
+    { icon:'notif',    label:t('notifications.title'), href:'#/notifications', badge:unread },
+    { icon:'users',    label:t('beneficiaries.title'), href:'#/beneficiaries' },
+    { icon:'profile',  label:t('profile.title'),       href:'#/profile' },
+    { icon:'settings', label:t('settings.title'),      href:'#/settings' },
+    { icon:'help',     label:t('profile.help'),        href:'#/help' }
+  ];
+  const grid = '<div class="ovy-more">' + items.map(i =>
+    '<a class="ovy-more__item" href="' + i.href + '"><span class="ovy-tile">' + svg(i.icon, 22) + '</span>' + esc(i.label) +
+    (i.badge ? '<span class="ovy-badge ovy-badge--accent ovy-more__n">' + i.badge + '</span>' : '') + '</a>').join('') + '</div>';
+  const banner =
+    '<a class="ovy-banner-card" href="#/security"><div class="ovy-tile" style="background:rgba(255,122,0,.18)">' + svg('security', 22) + '</div>' +
+    '<div><div style="font:var(--f-btn)">' + esc(t('more.securityTitle')) + '</div><div style="font:var(--f-small);opacity:.8">' + esc(t('more.securitySub')) + '</div></div></a>';
+  return layout(grid + banner, { title:t('more.title'), active:'#/more', back:'#/' });
+}
+
+/* -------- Services -------- */
+function screenServices(){
+  const cats = ServicesEngine.getCategories();
+  const labels = { bills:t('services.bills'), topup:t('services.topup'), internet:t('services.internet'), utilities:t('services.utilities'), subscriptions:t('services.subscriptions'), government:t('services.government'), other:t('services.other') };
+  const rows = cats.map(c =>
+    '<a class="ovy-list__row" href="#/services/' + c + '">' +
+      '<div class="ovy-tile">' + svg('services', 20) + '</div>' +
+      '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(labels[c] || c) + '</div></div>' + chevRow() +
+    '</a>').join('');
+  return layout('<div class="ovy-list">' + rows + '</div>', { title:t('services.title'), active:'#/more', back:'#/more' });
+}
+function screenServiceCategory(params){
+  const svcs = ServicesEngine.getServicesByCategory(params.cat);
+  const rows = svcs.length
+    ? svcs.map(s =>
+        '<div class="ovy-list__row" style="cursor:default">' +
+          '<div class="ovy-tile">' + svg('services', 20) + '</div>' +
+          '<div class="ovy-list__body">' +
+            '<div class="ovy-list__title">' + esc(s.name) + '</div>' +
+            '<div class="ovy-list__sub">' + esc(s.currency) + '</div>' +
+          '</div>' +
+          '<div class="ovy-list__right"><span class="ovy-badge ovy-badge--warn">' + esc(t('services.unavailable')) + '</span></div>' +
+        '</div>').join('')
+    : emptyBlock(null, t('services.unavailable'));
+  return layout('<div class="ovy-list">' + rows + '</div>', { title:t('services.title'), active:'#/more', back:'#/services' });
+}
+
+/* -------- History -------- */
+function screenHistory(){
+  let txs = TransactionEngine.getAll();
+  const chips = '<div class="ovy-chips">' +
+    [['all', t('history.all')], ['transfer', t('history.transfers')]].map(c =>
+      '<button class="ovy-chip" data-hf="' + c[0] + '" aria-pressed="' + (historyFilter === c[0]) + '">' + esc(c[1]) + '</button>').join('') + '</div>';
+  if (historyFilter !== 'all') txs = txs.filter(x => x.type === historyFilter);
+  if (!txs.length) return layout(chips + '<div class="ovy-empty">' + svg('history') + '<div class="ovy-empty__title">' + esc(t('history.empty')) + '</div></div>', { title:t('history.title'), active:'#/more', back:'#/more' });
+  const groups = {};
+  txs.forEach(x => {
+    const d = new Date(x.date);
+    const start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    (groups[start] = groups[start] || []).push(x);
+  });
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const yStart = todayStart - 86400000;
+  const keys = Object.keys(groups).map(Number).sort((a,b) => b - a);
+  const body = keys.map(k => {
+    let label;
+    if (k === todayStart) label = t('history.today');
+    else if (k === yStart) label = t('history.yesterday');
+    else label = new Date(k).toLocaleDateString(locale(), { day:'2-digit', month:'short', year:'numeric' });
+    return '<div class="ovy-label" style="margin-bottom:-8px">' + esc(label) + '</div><div class="ovy-list">' + groups[k].map(txRowHtml).join('') + '</div>';
+  }).join('');
+  return layout(chips + body, { title:t('history.title'), active:'#/more', back:'#/more' });
+}
+
+/* -------- Transaction Detail -------- */
+function screenTransactionDetail(params){
+  const tx = TransactionEngine.getById(params.id);
+  if (!tx) return layout(emptyBlock(null, '—'), { title:'—', back:'#/history' });
+  const r = ReceiptEngine.generate(tx.id);
+  const ok = tx.status === 'completed';
+  return layout(
+    '<div class="ovy-card">' +
+      '<div class="ovy-row ovy-row--between">' +
+        '<div><div class="ovy-label">' + esc(t('tx.status')) + '</div><div style="font:var(--f-h3)">' + esc(r.status) + '</div></div>' +
+        '<div style="color:' + (ok ? 'var(--success)' : 'var(--error)') + '">' + svg(ok ? 'check' : 'error', 28) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ovy-card">' +
+      '<div class="ovy-label">' + esc(t('tx.recipient')) + '</div>' +
+      '<div class="ovy-num" style="font:var(--f-amt-m);margin-top:6px">' + esc(r.recipientPhone) + '</div>' +
+      '<div style="font:var(--f-small);color:var(--text-2);margin-top:2px;word-break:break-all">' + esc(r.recipientMaskedName) + '</div>' +
+      '<div class="ovy-divider"></div>' +
+      row(t('tx.from'), r.fromAccountName) +
+      row(t('tx.amount'), r.amountFormatted) +
+      row(t('tx.fee'), r.feeFormatted) +
+      '<div class="ovy-divider"></div>' +
+      row(t('tx.total'), r.totalFormatted, true) +
+      row(t('tx.reference'), r.reference) +
+      row(t('tx.date'), r.dateHuman) +
+      row(t('tx.id'), r.transactionId) +
+    '</div>' +
+    '<a class="ovy-btn ovy-btn--primary ovy-btn--block" href="#/receipt/' + tx.id + '">' + esc(t('receipt.title')) + '</a>',
+    { title:t('tx.detail'), active:'#/more', back:'#/history' }
+  );
+}
+
+/* -------- Receipt -------- */
+function screenReceipt(params){
+  const tx = TransactionEngine.getById(params.id);
+  if (!tx) return layout(emptyBlock(null, '—'), { title:'—', back:'#/history' });
+  const r = ReceiptEngine.generate(tx.id);
+  return layout(
+    '<div class="ovy-card" style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">' + lockup(40) +
+      '<div class="ovy-label" style="margin-top:4px">' + esc(r.title) + '</div>' +
+    '</div>' +
+    '<div class="ovy-card">' +
+      row(t('tx.status'), r.status) +
+      '<div class="ovy-divider"></div>' +
+      '<div class="ovy-label">' + esc(t('tx.recipient')) + '</div>' +
+      '<div class="ovy-num" style="font:var(--f-amt-m);margin-top:4px">' + esc(r.recipientPhone) + '</div>' +
+      '<div style="font:var(--f-small);color:var(--text-2);word-break:break-all">' + esc(r.recipientMaskedName) + '</div>' +
+      '<div class="ovy-divider"></div>' +
+      row(t('tx.from'), r.fromAccountName) +
+      row(t('tx.amount'), r.amountFormatted) +
+      row(t('tx.fee'), r.feeFormatted) +
+      row(t('tx.total'), r.totalFormatted, true) +
+      '<div class="ovy-divider"></div>' +
+      row(t('tx.reference'), r.reference) +
+      row(t('tx.date'), r.dateHuman) +
+      row(t('tx.id'), r.transactionId) +
+    '</div>' +
+    '<button id="rc-share" class="ovy-btn ovy-btn--primary ovy-btn--block">' + svg('share', 18) + esc(t('receipt.share')) + '</button>' +
+    '<a class="ovy-btn ovy-btn--outline ovy-btn--block" href="#/">' + esc(t('action.done')) + '</a>',
+    { title:t('receipt.title'), active:'#/more', back:'#/history' }
+  );
+}
+
+/* -------- Notifications -------- */
+function screenNotifications(){
+  const all = NotificationEngine.getAll();
+  const list = notifFilter === 'unread' ? all.filter(n => !n.read) : all;
+  const chips = '<div class="ovy-chips">' +
+    [['all', t('notifications.all')], ['unread', t('notifications.unread')]].map(c =>
+      '<button class="ovy-chip" data-nf="' + c[0] + '" aria-pressed="' + (notifFilter === c[0]) + '">' + esc(c[1]) + '</button>').join('') + '</div>';
+  const right = '<button id="notif-mark-all" class="ovy-header__icon" aria-label="' + esc(t('action.done')) + '">' + svg('check') + '</button>';
+  const opts = { title:t('notifications.title'), active:'#/more', back:'#/more', right };
+  if (!list.length) return layout(chips + '<div class="ovy-empty">' + svg('notif') + '<div class="ovy-empty__title">' + esc(t('notifications.empty')) + '</div></div>', opts);
+  const rows = list.map(n =>
+    '<button class="ovy-list__row" data-notif="' + n.id + '">' +
+      '<div class="ovy-tile" style="' + (n.read ? '--tint:var(--text-3)' : '') + '">' + svg('notif', 20) + '</div>' +
+      '<div class="ovy-list__body">' +
+        '<div class="ovy-list__title">' + esc(n.titleKey ? t(n.titleKey) : n.title) + '</div>' +
+        '<div class="ovy-list__sub ovy-num" style="white-space:pre-line">' + esc(n.message) + '</div>' +
+        '<div class="ovy-list__sub" style="color:var(--text-3);margin-top:4px">' + esc(timeAgo(n.createdAt)) + '</div>' +
+      '</div>' +
+      (!n.read ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--ovy-orange);flex-shrink:0"></div>' : '') +
+    '</button>').join('');
+  return layout(chips + '<div class="ovy-list">' + rows + '</div>', opts);
+}
+
+/* -------- Profile -------- */
+function screenProfile(){
+  const p = ProfileEngine.get();
+  const kyc = p.kycStatus || 'not_started';
+  const item = (href, icon, label, right, id) => {
+    const inner = '<div class="ovy-tile">' + svg(icon, 20) + '</div><div class="ovy-list__body"><div class="ovy-list__title">' + esc(label) + '</div></div><div class="ovy-list__right">' + (right || svg('chev')) + '</div>';
+    return href ? '<a class="ovy-list__row" href="' + href + '">' + inner + '</a>' : '<button class="ovy-list__row" id="' + id + '">' + inner + '</button>';
+  };
+  return layout(
+    '<div class="ovy-card ovy-row">' +
+      '<div class="ovy-avatar ovy-avatar--lg">' + esc(initialsOf(p)) + '</div>' +
+      '<div class="ovy-grow">' +
+        '<div style="font:var(--f-h3)">' + esc(p.displayName || 'OVY User') + '</div>' +
+        '<div class="ovy-num" style="font:var(--f-small);color:var(--text-2)">' + esc(p.phone || '—') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ovy-list">' +
+      item('#/profile/edit', 'user', t('profile.edit')) +
+      item('#/security', 'security', t('profile.security')) +
+      item('#/kyc', 'doc', t('profile.kyc'), '<span class="ovy-badge ovy-badge--accent">' + esc(t('kyc.status.' + kyc)) + '</span>') +
+      item('#/settings', 'settings', t('settings.title')) +
+      item('#/help', 'help', t('profile.help')) +
+      '<button class="ovy-list__row" id="profile-logout"><div class="ovy-tile" style="--tint:var(--error)">' + svg('logout', 20) + '</div><div class="ovy-list__body"><div class="ovy-list__title" style="color:var(--error)">' + esc(t('profile.logout')) + '</div></div></button>' +
+    '</div>',
+    { title:t('profile.title'), active:'#/more', back:'#/more' }
+  );
+}
+function screenProfileEdit(){
+  const p = ProfileEngine.get();
+  const f = (id, key, val, extra) => '<div class="ovy-input"><label class="ovy-input__label" for="' + id + '">' + esc(t(key)) + '</label><input id="' + id + '" class="ovy-input__field" value="' + esc(val) + '"' + (extra || '') + ' /></div>';
+  return layout(
+    f('p-first','profile.firstName',p.firstName) + f('p-last','profile.lastName',p.lastName) + f('p-disp','profile.displayName',p.displayName) +
+    f('p-email','profile.email',p.email,' type="email"') + f('p-phone','profile.phone',p.phone,' inputmode="tel"') + f('p-country','profile.country',p.country) +
+    '<button id="p-save" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('action.save')) + '</button>',
+    { title:t('profile.edit'), active:'#/more', back:'#/profile' }
+  );
+}
+
+/* -------- Security -------- */
+function screenSecurity(){
+  const item = (id, icon, label) => '<button class="ovy-list__row" id="' + id + '"><div class="ovy-tile">' + svg(icon, 20) + '</div><div class="ovy-list__body"><div class="ovy-list__title">' + esc(label) + '</div></div>' + chevRow() + '</button>';
+  return layout('<div class="ovy-list">' + item('sec-set-pin','key',t('security.setPin')) + item('sec-events','history',t('security.events')) + '</div>',
+    { title:t('security.title'), active:'#/more', back:'#/more' });
+}
+
+/* -------- Settings -------- */
+function screenSettings(){
+  const s = settingsGet();
+  const item = (href, icon, label, sub) => '<a class="ovy-list__row" href="' + href + '"><div class="ovy-tile">' + svg(icon, 20) + '</div><div class="ovy-list__body"><div class="ovy-list__title">' + esc(label) + '</div><div class="ovy-list__sub">' + esc(sub) + '</div></div>' + chevRow() + '</a>';
+  return layout('<div class="ovy-list">' +
+    item('#/settings/language', 'globe', t('settings.language'), (s.language || currentLang).toUpperCase()) +
+    item('#/settings/theme', 'moon', t('settings.theme'), t('settings.theme.' + (s.theme || 'system'))) + '</div>',
+    { title:t('settings.title'), active:'#/more', back:'#/more' });
+}
+function screenSettingsLanguage(){
+  const cur = settingsGet().language || currentLang;
+  const items = [{k:'fr', l:'Français'}, {k:'en', l:'English'}, {k:'ar', l:'العربية'}].map(x =>
+    '<button class="ovy-list__row" data-lang="' + x.k + '">' +
+      '<div class="ovy-tile">' + svg('globe', 20) + '</div>' +
+      '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(x.l) + '</div></div>' +
+      '<div class="ovy-list__right" style="color:var(--ovy-orange)">' + (cur === x.k ? svg('check', 20, 3) : '') + '</div>' +
+    '</button>').join('');
+  return layout('<div class="ovy-list">' + items + '</div>', { title:t('settings.language'), active:'#/more', back:'#/settings' });
+}
+function screenSettingsTheme(){
+  const cur = settingsGet().theme || 'system';
+  const items = ['light','dark','system'].map(x =>
+    '<button class="ovy-list__row" data-set-theme="' + x + '">' +
+      '<div class="ovy-tile">' + svg(x === 'dark' ? 'moon' : 'sun', 20) + '</div>' +
+      '<div class="ovy-list__body"><div class="ovy-list__title">' + esc(t('settings.theme.' + x)) + '</div></div>' +
+      '<div class="ovy-list__right" style="color:var(--ovy-orange)">' + (cur === x ? svg('check', 20, 3) : '') + '</div>' +
+    '</button>').join('');
+  return layout('<div class="ovy-list">' + items + '</div>', { title:t('settings.theme'), active:'#/more', back:'#/settings' });
+}
+
+/* -------- KYC -------- */
+function screenKyc(){
+  const k = KycEngine.get();
+  const status = k ? k.status : 'not_started';
+  const opts = { title:t('kyc.title'), active:'#/more', back:'#/profile' };
+  if (!k || status === 'not_started'){
+    return layout(
+      '<div class="ovy-card"><div style="font:var(--f-h2)">' + esc(t('kyc.title')) + '</div>' +
+      '<div style="font:var(--f-small);color:var(--text-2);margin-top:6px">' + esc(t('kyc.status.not_started')) + '</div></div>' +
+      '<button id="kyc-start" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('kyc.start')) + '</button>', opts);
+  }
+  if (status === 'draft'){
+    const f = (id, key, val, extra, star) => '<div class="ovy-input"><label class="ovy-input__label" for="' + id + '">' + esc(t(key)) + (star ? ' *' : '') + '</label><input id="' + id + '" class="ovy-input__field" value="' + esc(val||'') + '"' + (extra || '') + ' /></div>';
+    return layout(
+      f('k-first','profile.firstName',k.firstName,'',true) + f('k-last','profile.lastName',k.lastName,'',true) +
+      f('k-dob','kyc.dateOfBirth',k.dateOfBirth,' type="date"') + f('k-nat','kyc.nationality',k.nationality) + f('k-addr','kyc.address',k.address) +
+      '<button id="kyc-save" class="ovy-btn ovy-btn--secondary ovy-btn--block">' + esc(t('action.save')) + '</button>' +
+      '<button id="kyc-submit" class="ovy-btn ovy-btn--primary ovy-btn--block">' + esc(t('kyc.submit')) + '</button>', opts);
+  }
+  return layout(
+    '<div class="ovy-card"><div style="font:var(--f-h2)">' + esc(t('kyc.title')) + '</div>' +
+    '<div style="margin-top:8px"><span class="ovy-badge ovy-badge--accent">' + esc(t('kyc.status.' + status)) + '</span></div></div>', opts);
+}
+
+/* -------- Help -------- */
+function screenHelp(){
+  return layout(
+    '<div class="ovy-card"><div style="font:var(--f-h3)">' + esc(t('profile.help')) + '</div>' +
+    '<div style="font:var(--f-small);color:var(--text-2);margin-top:6px">OVY Wallet</div></div>',
+    { title:t('profile.help'), active:'#/more', back:'#/more' }
+  );
+}
+
+/* ==========================================================================
+   ROUTER
+   ========================================================================== */
+const SCREENS = {
+  'login': screenLogin,
+  '': screenDashboard,
+  'accounts': screenAccounts,
+  'account': screenAccountDetail,
+  'transfer': (p) => ({
+    home:screenTransferHome, type:screenTransferType, method:screenTransferMethod,
+    beneficiary:screenTransferBeneficiary, source_account:screenTransferSource,
+    amount:screenTransferAmount, fees:screenTransferFees,
+    confirmation:screenTransferConfirmation, otp:screenTransferOtp,
+    processing:screenTransferProcessing, success:screenTransferSuccess
+  }[p.step || 'home'] || screenTransferHome)(p),
+  'beneficiaries': screenBeneficiaries,
+  'beneficiaries/new': screenBeneficiaryNew,
+  'cards': screenCards,
+  'card': screenCardDetail,
+  'cards/new': screenCreateVirtualCard,
+  'crypto': screenCrypto,
+  'more': screenMore,
+  'services': screenServices,
+  'services/cat': screenServiceCategory,
+  'history': screenHistory,
+  'transaction': screenTransactionDetail,
+  'receipt': screenReceipt,
+  'notifications': screenNotifications,
+  'profile': screenProfile,
+  'profile/edit': screenProfileEdit,
+  'security': screenSecurity,
+  'settings': screenSettings,
+  'settings/language': screenSettingsLanguage,
+  'settings/theme': screenSettingsTheme,
+  'kyc': screenKyc,
+  'help': screenHelp
+};
+
+function parseHash(){
+  let h = (location.hash || '#/').slice(1);
+  if (!h) h = '/';
+  return h.split('/').filter(Boolean);
+}
+
+function route(){
+  const parts = parseHash();
+  const isAuth = SessionEngine.isAuthenticated();
+
+  if (!isAuth && parts[0] !== 'login'){
+    if (location.hash !== '#/login'){ location.hash = '#/login'; return; }
+  }
+  if (isAuth && parts[0] === 'login'){
+    if (location.hash !== '#/'){ location.hash = '#/'; return; }
+  }
+
+  let key, params = {};
+  if (parts.length === 0){ key = ''; }
+  else if (parts[0] === 'login'){ key = 'login'; }
+  else if (parts[0] === 'account' && parts[1]){ key = 'account'; params.id = parts[1]; }
+  else if (parts[0] === 'accounts'){ key = 'accounts'; }
+  else if (parts[0] === 'transfer'){ key = 'transfer'; params.step = parts[1] || 'home'; }
+  else if (parts[0] === 'beneficiaries' && parts[1] === 'new'){ key = 'beneficiaries/new'; }
+  else if (parts[0] === 'beneficiaries'){ key = 'beneficiaries'; }
+  else if (parts[0] === 'cards' && parts[1] === 'new'){ key = 'cards/new'; }
+  else if (parts[0] === 'card' && parts[1]){ key = 'card'; params.id = parts[1]; }
+  else if (parts[0] === 'cards'){ key = 'cards'; }
+  else if (parts[0] === 'crypto'){ key = 'crypto'; }
+  else if (parts[0] === 'more'){ key = 'more'; }
+  else if (parts[0] === 'services' && parts[1]){ key = 'services/cat'; params.cat = parts[1]; }
+  else if (parts[0] === 'services'){ key = 'services'; }
+  else if (parts[0] === 'history'){ key = 'history'; }
+  else if (parts[0] === 'transaction' && parts[1]){ key = 'transaction'; params.id = parts[1]; }
+  else if (parts[0] === 'receipt' && parts[1]){ key = 'receipt'; params.id = parts[1]; }
+  else if (parts[0] === 'notifications'){ key = 'notifications'; }
+  else if (parts[0] === 'profile' && parts[1] === 'edit'){ key = 'profile/edit'; }
+  else if (parts[0] === 'profile'){ key = 'profile'; }
+  else if (parts[0] === 'security'){ key = 'security'; }
+  else if (parts[0] === 'settings' && parts[1] === 'language'){ key = 'settings/language'; }
+  else if (parts[0] === 'settings' && parts[1] === 'theme'){ key = 'settings/theme'; }
+  else if (parts[0] === 'settings'){ key = 'settings'; }
+  else if (parts[0] === 'kyc'){ key = 'kyc'; }
+  else if (parts[0] === 'help'){ key = 'help'; }
+  else { key = isAuth ? '' : 'login'; }
+
+  // le tunnel de transfert ne peut pas être rejoué à l'aveugle (refresh, retour, URL directe)
+  if (key === 'transfer'){
+    const redirect = transferGuard(params.step);
+    if (redirect && redirect !== location.hash){ location.hash = redirect; return; }
+  }
+
+  const screen = SCREENS[key] || (isAuth ? screenDashboard : screenLogin);
+  const root = document.getElementById('ovy-app');
+  root.innerHTML = screen(params);
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  window.scrollTo(0,0);
+  attachHandlers(key, params);
+}
+
+/* ==========================================================================
+   HANDLERS (attachés au DOM fraîchement rendu — rien n'est attaché à document/html)
+   ========================================================================== */
+async function runProcessing(){
+  const started = Date.now();
+  try {
+    const receipt = await TransferEngine.commit();
+    const wait = Math.max(0, 1100 - (Date.now() - started));
+    if (wait) await new Promise(r => setTimeout(r, wait));
+    const tx = TransactionEngine.getById(receipt.transactionId);
+    if (tx){
+      PresentationQueue.enqueue({
+        id: tx.id, title: t('transfer.success'),
+        phone: tx.beneficiaryPhone || '',
+        maskedName: tx.beneficiaryMaskedName || '',
+        amount: Money.format(tx.amount, tx.currency),
+        transactionId: tx.id
+      });
+    }
+    if (location.hash === '#/transfer/processing') go('#/transfer/success');
+  } catch (e){
+    toast(errText(e));
+    if (location.hash === '#/transfer/processing') go('#/transfer/confirmation');
+  }
+}
+
+function attachHandlers(key, params){
+  // ---- Login
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn){
+    const pw = document.getElementById('login-password');
+    const ph = document.getElementById('login-phone');
+    let busy = false;
+    const submit = async () => {
+      if (busy) return;
+      const phone = (ph.value || '').trim();
+      const pass  = pw.value || '';
+      if (phone === PRIMARY_ACCOUNT.phone && pass === PRIMARY_ACCOUNT.password){
+        busy = true;
+        LoadingManager.start('login');
+        await SessionEngine.login(phone);
+        LoadingManager.stop('login');
+        go('#/');
+      } else {
+        document.getElementById('login-err').textContent = t('login.error');
+      }
+    };
+    loginBtn.addEventListener('click', submit);
+    pw.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    ph.addEventListener('keydown', e => { if (e.key === 'Enter') pw.focus(); });
+    document.getElementById('login-eye').addEventListener('click', e => {
+      const show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      e.currentTarget.innerHTML = svg(show ? 'eyeoff' : 'eye', 20);
+    });
+    document.querySelectorAll('[data-unavailable]').forEach(b => b.addEventListener('click', () => toast(t('errors.PROVIDER_UNAVAILABLE'))));
+    return;
+  }
+
+  // ---- Header back
+  document.querySelectorAll('[data-nav]').forEach(b => {
+    b.addEventListener('click', () => go(b.getAttribute('data-nav')));
+  });
+
+  // ---- Dashboard
+  const eye = document.querySelector('[data-toggle-balance]');
+  if (eye) eye.addEventListener('click', async () => {
+    await StorageEngine.set('settings', { ...settingsGet(), hideBalance: !settingsGet().hideBalance });
+    route();
+  });
+
+  // ---- History / notifications filters
+  document.querySelectorAll('[data-hf]').forEach(b => b.addEventListener('click', () => { historyFilter = b.getAttribute('data-hf'); route(); }));
+  document.querySelectorAll('[data-nf]').forEach(b => b.addEventListener('click', () => { notifFilter = b.getAttribute('data-nf'); route(); }));
+
+  // ---- Notifications
+  const markAll = document.getElementById('notif-mark-all');
+  if (markAll) markAll.addEventListener('click', async () => { await NotificationEngine.markAllAsRead(); route(); });
+  document.querySelectorAll('[data-notif]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-notif');
+      const n = NotificationEngine.getById(id);
+      if (!n) return;
+      await NotificationEngine.markAsRead(id);
+      if (n.transactionId) go('#/transaction/' + n.transactionId);
+      else route();
+    });
+  });
+
+  // ---- Transfer : type / méthode
+  document.querySelectorAll('[data-tt]').forEach(b => b.addEventListener('click', () => {
+    try { TransferEngine.setType(b.getAttribute('data-tt')); go('#/transfer/method'); }
+    catch (e){ toast(errText(e)); }
+  }));
+  document.querySelectorAll('[data-tm]').forEach(b => b.addEventListener('click', () => {
+    try { TransferEngine.setMethod(b.getAttribute('data-tm')); go('#/transfer/beneficiary'); }
+    catch (e){ toast(errText(e)); }
+  }));
+
+  // ---- Transfer : bénéficiaire (validation → recherche → reconnaissance → résultat)
+  document.querySelectorAll('[data-tb]').forEach(b => b.addEventListener('click', () => {
+    const ben = BeneficiaryEngine.getById(b.getAttribute('data-tb'));
+    if (!ben) return;
+    try { TransferEngine.setBeneficiary(ben); go('#/transfer/source_account'); }
+    catch (e){ toast(errText(e)); }
+  }));
+  const tPhone = document.getElementById('t-phone');
+  if (tPhone){
+    const box = document.getElementById('t-recog');
+    const next = document.getElementById('t-ben-next');
+    const dots = '<div class="ovy-recog__ring"></div>';
+    let timer = null, found = null, seq = 0;
+    const show = (html, cls) => { box.className = 'ovy-recog ' + cls; box.innerHTML = html; };
+    tPhone.addEventListener('input', () => {
+      clearTimeout(timer);
+      const my = ++seq;
+      found = null; next.disabled = true;
+      const v = tPhone.value.trim();
+      if (v.length < 4){ show('', 'is-empty'); return; }
+      show(dots + '<div class="ovy-recog__label">' + esc(t('transfer.searching')) + '</div>', '');
+      timer = setTimeout(() => {
+        if (my !== seq) return;
+        show(dots + '<div class="ovy-recog__label">' + esc(t('transfer.recognizing')) + '</div>', '');
+        timer = setTimeout(() => {
+          if (my !== seq) return;
+          const r = BeneficiaryEngine.resolve(v);
+          if (r.state === 'found'){
+            found = r.data; next.disabled = false;
+            show('<div class="ovy-recog__icon">' + svg('check', 22, 3) + '</div>' +
+              '<div class="ovy-grow"><div class="ovy-recog__label">' + esc(t('transfer.found')) + '</div>' +
+              '<div class="ovy-recog__name">' + esc(r.maskedName) + '</div>' +
+              '<div class="ovy-recog__phone ovy-num">' + esc(r.data.phoneRaw || r.data.phone) + '</div></div>', 'is-found');
+          } else {
+            show('<div class="ovy-recog__icon ovy-recog__icon--err">' + svg('close', 22, 3) + '</div>' +
+              '<div class="ovy-grow"><div class="ovy-recog__name" style="font:var(--f-btn)">' + esc(t('transfer.notFound')) + '</div>' +
+              '<div class="ovy-recog__phone">' + esc(t('transfer.checkNumber')) + '</div>' +
+              '<button class="ovy-btn ovy-btn--secondary ovy-btn--sm" style="margin-top:10px" data-add-ben>' + esc(t('beneficiaries.add')) + '</button></div>', 'is-missing');
+          }
+        }, 350);
+      }, 350);
+    });
+    box.addEventListener('click', e => {
+      if (!e.target.closest('[data-add-ben]')) return;
+      pendingBen = { phone: tPhone.value.trim(), returnTo: '#/transfer/beneficiary' };
+      go('#/beneficiaries/new');
+    });
+    next.addEventListener('click', () => {
+      if (!found) return;
+      try { TransferEngine.setBeneficiary(found); go('#/transfer/source_account'); }
+      catch (e){ toast(errText(e)); }
+    });
+  }
+
+  // ---- Transfer : compte source / montant / frais / confirmation
+  document.querySelectorAll('[data-tsa]').forEach(b => b.addEventListener('click', () => {
+    try { TransferEngine.setSourceAccount(b.getAttribute('data-tsa')); go('#/transfer/amount'); }
+    catch (e){ toast(errText(e)); }
+  }));
+  const tAmount = document.getElementById('t-amount');
+  if (tAmount){
+    const parse = () => parseFloat(String(tAmount.value).replace(',', '.'));
+    const errBox = document.getElementById('t-amount-err');
+    const prev = document.getElementById('t-fee-preview');
+    const cur = TransferEngine.getState().sourceCurrency || 'OMR';
+    tAmount.addEventListener('input', () => {
+      errBox.textContent = '';
+      const v = parse();
+      prev.textContent = Money.format(v > 0 ? TransferEngine.previewFee(v) : 0, cur);
+    });
+    const submitAmount = () => {
+      const v = parse();
+      try {
+        TransferEngine.setAmount(v);
+        const { total } = TransferEngine.calculateFees();
+        const acc = AccountEngine.getById(TransferEngine.getState().sourceAccountId);
+        if (!acc || !Money.gte(acc.availableBalance, total, cur)){ errBox.textContent = t('errors.INSUFFICIENT_BALANCE'); return; }
+        go('#/transfer/fees');
+      } catch (e){ errBox.textContent = errText(e); }
+    };
+    document.getElementById('t-amount-next').addEventListener('click', submitAmount);
+    tAmount.addEventListener('keydown', e => { if (e.key === 'Enter') submitAmount(); });
+    if (tAmount.value) tAmount.dispatchEvent(new Event('input'));
+  }
+  const tFeesNext = document.getElementById('t-fees-next');
+  if (tFeesNext) tFeesNext.addEventListener('click', () => go('#/transfer/confirmation'));
+
+  const tConfirm = document.getElementById('t-confirm');
+  if (tConfirm){
+    tConfirm.addEventListener('click', () => {
+      try { TransferEngine.confirm(); go('#/transfer/otp'); }
+      catch (e){ toast(errText(e)); }
+    });
+  }
+
+  // ---- OTP (les données du transfert ne sont jamais perdues sur une erreur)
+  const otpDots = document.getElementById('otp-dots');
+  if (otpDots){
+    let code = '', busy = false;
+    const update = () => { otpDots.querySelectorAll('i').forEach((d,i) => d.classList.toggle('on', i < code.length)); };
+    document.querySelectorAll('[data-key]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (busy) return;
+        const k = btn.getAttribute('data-key');
+        document.getElementById('otp-err').textContent = '';
+        if (k === 'del'){ code = code.slice(0,-1); update(); return; }
+        if (code.length >= 6) return;
+        code += k; update();
+        if (code.length === 6){
+          busy = true;
+          const r = TransferEngine.verifyOTP(code);
+          if (r.ok){ go('#/transfer/processing'); return; }
+          document.getElementById('otp-err').textContent = t('errors.INVALID_OTP');
+          otpDots.classList.remove('ovy-shake'); void otpDots.offsetWidth; otpDots.classList.add('ovy-shake');
+          setTimeout(() => { code = ''; update(); busy = false; }, 320);
+        }
+      });
+    });
+  }
+
+  // ---- Processing : le commit est déclenché ici, une seule fois par affichage, et il est idempotent
+  if (key === 'transfer' && params.step === 'processing') runProcessing();
+
+  // ---- Beneficiary new
+  const bSave = document.getElementById('b-save');
+  if (bSave){
+    bSave.addEventListener('click', async () => {
+      const err = document.getElementById('b-err');
+      err.textContent = '';
+      try {
+        await BeneficiaryEngine.add({
+          name: document.getElementById('b-name').value,
+          phone: document.getElementById('b-phone').value,
+          accountNumber: document.getElementById('b-account').value || null,
+          iban: document.getElementById('b-iban').value || null,
+          bank: document.getElementById('b-bank').value || null,
+          country: document.getElementById('b-country').value || null,
+          currency: document.getElementById('b-currency').value
+        });
+        const dest = pendingBen ? pendingBen.returnTo : '#/beneficiaries';
+        pendingBen = null;
+        go(dest);
+      } catch (e){
+        err.textContent = errText(e);
+      }
+    });
+  }
+  if (key !== 'beneficiaries/new' && key !== 'transfer' && pendingBen) pendingBen = null;
+
+  // ---- Cards
+  document.querySelectorAll('[data-card-action]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const a = btn.getAttribute('data-card-action');
+      const id = btn.closest('[data-card-id]').getAttribute('data-card-id');
+      try {
+        if (a === 'activate') await CardEngine.activate(id);
+        if (a === 'freeze')   await CardEngine.freeze(id);
+        if (a === 'unfreeze') await CardEngine.unfreeze(id);
+        if (a === 'close')    await CardEngine.close(id);
+        route();
+      } catch (e){ toast(errText(e)); }
+    });
+  });
+  const cvCreate = document.getElementById('cv-create');
+  if (cvCreate){
+    cvCreate.addEventListener('click', async () => {
+      const holder = document.getElementById('cv-holder').value.trim();
+      const cur = document.getElementById('cv-currency').value;
+      if (!holder){ document.getElementById('cv-holder').setAttribute('aria-invalid', 'true'); return; }
+      try { await CardEngine.createVirtual({ currency: cur, holderName: holder }); go('#/cards'); }
+      catch (e){ toast(errText(e)); }
+    });
+  }
+
+  // ---- Crypto
+  document.querySelectorAll('[data-crypto-create]').forEach(b => b.addEventListener('click', async () => {
+    try { await CryptoEngine.createWallet(b.getAttribute('data-crypto-create')); toast(t('crypto.walletCreated')); route(); }
+    catch (e){ toast(errText(e)); }
+  }));
+
+  // ---- Profile
+  const pSave = document.getElementById('p-save');
+  if (pSave){
+    pSave.addEventListener('click', async () => {
+      await ProfileEngine.update({
+        firstName: document.getElementById('p-first').value.trim(),
+        lastName: document.getElementById('p-last').value.trim(),
+        displayName: document.getElementById('p-disp').value.trim(),
+        email: document.getElementById('p-email').value.trim(),
+        phone: document.getElementById('p-phone').value.trim(),
+        country: document.getElementById('p-country').value.trim()
+      });
+      go('#/profile');
+    });
+  }
+  const logoutBtn = document.getElementById('profile-logout');
+  if (logoutBtn) logoutBtn.addEventListener('click', async () => {
+    await SessionEngine.logout();
+    TransferEngine.reset();
+    go('#/login');
+  });
+
+  // ---- Security
+  const secSetPin = document.getElementById('sec-set-pin');
+  if (secSetPin) secSetPin.addEventListener('click', async () => {
+    const pin = await askPin();
+    if (!pin) return;
+    try { await SecurityEngine.setPin(pin); toast(t('security.pinSet')); }
+    catch (e){ toast(errText(e)); }
+  });
+  const secEvents = document.getElementById('sec-events');
+  if (secEvents) secEvents.addEventListener('click', () => toast(t('errors.PROVIDER_UNAVAILABLE')));
+
+  // ---- Settings
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', async () => {
+    const l = b.getAttribute('data-lang');
+    currentLang = l;
+    await StorageEngine.set('settings', { ...settingsGet(), language: l });
+    route();
+  }));
+  document.querySelectorAll('[data-set-theme]').forEach(b => b.addEventListener('click', async () => {
+    const th = b.getAttribute('data-set-theme');
+    await StorageEngine.set('settings', { ...settingsGet(), theme: th });
+    ThemeEngine.apply(th);
+    route();
+  }));
+
+  // ---- KYC
+  const kStart = document.getElementById('kyc-start');
+  if (kStart) kStart.addEventListener('click', async () => { await KycEngine.start(); route(); });
+  const readKyc = () => ({
+    firstName: document.getElementById('k-first').value.trim(),
+    lastName: document.getElementById('k-last').value.trim(),
+    dateOfBirth: document.getElementById('k-dob').value || null,
+    nationality: document.getElementById('k-nat').value.trim() || null,
+    address: document.getElementById('k-addr').value.trim() || null
+  });
+  const kSave = document.getElementById('kyc-save');
+  if (kSave) kSave.addEventListener('click', async () => {
+    try { await KycEngine.updateDraft(readKyc()); toast(t('action.save')); }
+    catch (e){ toast(errText(e)); }
+  });
+  const kSubmit = document.getElementById('kyc-submit');
+  if (kSubmit) kSubmit.addEventListener('click', async () => {
+    try { await KycEngine.updateDraft(readKyc()); await KycEngine.submit(); route(); }
+    catch (e){ toast(errText(e)); }
+  });
+
+  // ---- Receipt share
+  const rcShare = document.getElementById('rc-share');
+  if (rcShare) rcShare.addEventListener('click', async () => {
+    const tx = TransactionEngine.getById(params.id);
+    if (!tx) return;
+    const text = 'OVY Wallet\n' + tx.reference + '\n' + Money.format(tx.amount, tx.currency);
+    if (navigator.share){ try { await navigator.share({ title:'OVY Receipt', text }); } catch {} }
+    else if (navigator.clipboard){ try { await navigator.clipboard.writeText(text); toast(t('action.copied')); } catch {} }
+  });
+}
+
+/* ==========================================================================
+   STARTUP
+   ========================================================================== */
+const STARTUP_TASKS = [
+  { label:'Storage',     run: async () => { await StorageEngine.init(); } },
+  { label:'Migration',   run: async () => { await StorageEngine.migrate(); } },
+  { label:'Settings',    run: async () => {
+      const s = settingsGet();
+      currentLang = s.language || (navigator.language || 'fr').slice(0,2);
+      if (!['fr','en','ar'].includes(currentLang)) currentLang = 'fr';
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      ThemeEngine.apply(s.theme || 'system');
+  }},
+  { label:'Accounts',    run: async () => { await AccountEngine.ensureDefaults(); } },
+  { label:'Profile',     run: async () => { ProfileEngine.get(); } },
+  { label:'Ready',       run: async () => {} }
+];
+
+async function boot(){
+  document.getElementById('ovy-boot-brand').innerHTML = lockup(60);
+  const fill = document.getElementById('ovy-boot-fill');
+  const label = document.getElementById('ovy-boot-label');
+  const tag = document.getElementById('ovy-boot-tag');
+  tag.textContent = t('boot.tagline');
+  for (let i = 0; i < STARTUP_TASKS.length; i++){
+    const task = STARTUP_TASKS[i];
+    label.textContent = task.label;
+    fill.style.width = Math.round((i / STARTUP_TASKS.length) * 100) + '%';
+    await task.run();
+    if (i === 2){ tag.textContent = t('boot.tagline'); }
+  }
+  label.textContent = t('boot.loading');
+  fill.style.width = '100%';
+  await new Promise(r => setTimeout(r, 180));
+  document.getElementById('ovy-boot').classList.add('is-hidden');
+
+  EventBus.on('unreadChanged', () => {
+    if (location.hash === '#/notifications' || location.hash === '#/' || location.hash === '') route();
+  });
+  if (window.matchMedia){
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = () => { if ((settingsGet().theme || 'system') === 'system') ThemeEngine.apply('system'); };
+    if (mq.addEventListener) mq.addEventListener('change', onChange);
+  }
+
+  window.addEventListener('hashchange', route);
+  route();
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+
+})();
+</script>
+</body>
+</html>
